@@ -213,6 +213,26 @@ debounce_ms = 300
 
 CLI flags override config file values.
 
+## AI Tool Templates
+
+Generate ready-to-use configuration templates for popular AI coding tools:
+
+```bash
+# Generate all templates (.cursorrules, CLAUDE.md, AGENTS.md)
+agentmap init --templates
+
+# Generate specific templates only
+agentmap init --templates=cursor
+agentmap init --templates=claude,opencode
+```
+
+Supported tools:
+- **Cursor** (`.cursorrules`) - Instructions for Cursor IDE
+- **Claude Code** (`CLAUDE.md`) - Instructions for Claude Code
+- **OpenCode** (`AGENTS.md`) - Instructions for OpenCode
+
+Templates are **non-destructive**: they append to existing files and skip if agentmap section already exists.
+
 ## CI Integration
 
 Validate documentation freshness in CI pipelines:

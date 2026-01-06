@@ -8,7 +8,8 @@ use agentmap::analyze::{
     detect_modules, extract_imports, extract_memory_markers, extract_symbols, FileGraph, ModuleInfo,
 };
 use agentmap::cli::{
-    install_hooks, remove_hooks, run_check, run_update, run_watch, Args, Command, HooksAction,
+    install_hooks, remove_hooks, run_check, run_templates, run_update, run_watch, Args, Command,
+    HooksAction,
 };
 use agentmap::emit::{
     calculate_module_state, current_timestamp, write_hierarchical, CriticalFile, DiffInfo,
@@ -42,9 +43,13 @@ fn main() -> Result<()> {
                 HooksAction::Remove => remove_hooks(&path),
             };
         }
-        Some(Command::Init { config, hooks }) => {
+        Some(Command::Init {
+            config,
+            hooks,
+            templates,
+        }) => {
             let path = args.path.canonicalize().unwrap_or(args.path.clone());
-            return run_init(&path, config, hooks);
+            return run_init(&path, config, hooks, templates, &args.output);
         }
         None => {}
     }
@@ -464,7 +469,13 @@ fn run_hierarchical_output(
     Ok(())
 }
 
-fn run_init(path: &std::path::Path, config: bool, hooks: bool) -> Result<()> {
+fn run_init(
+    path: &std::path::Path,
+    config: bool,
+    hooks: bool,
+    templates: Option<Option<String>>,
+    output: &std::path::Path,
+) -> Result<()> {
     let mut did_something = false;
 
     if config {
@@ -482,10 +493,21 @@ fn run_init(path: &std::path::Path, config: bool, hooks: bool) -> Result<()> {
         did_something = true;
     }
 
+    if let Some(template_arg) = templates {
+        let agentmap_dir = output.to_string_lossy();
+        run_templates(path, template_arg, &agentmap_dir)?;
+        did_something = true;
+    }
+
     if !did_something {
-        eprintln!("Usage: agentmap init [--config] [--hooks]");
-        eprintln!("  --config  Create agentmap.toml with default settings");
-        eprintln!("  --hooks   Install git hooks for automatic regeneration");
+        eprintln!("Usage: agentmap init [--config] [--hooks] [--templates[=TOOLS]]");
+        eprintln!("  --config              Create agentmap.toml with default settings");
+        eprintln!("  --hooks               Install git hooks for automatic regeneration");
+        eprintln!("  --templates           Generate AI tool templates (all by default)");
+        eprintln!("  --templates=cursor    Generate only Cursor (.cursorrules)");
+        eprintln!("  --templates=claude    Generate only Claude Code (CLAUDE.md)");
+        eprintln!("  --templates=opencode  Generate only OpenCode (AGENTS.md)");
+        eprintln!("  --templates=cursor,claude  Generate multiple specific templates");
     }
 
     Ok(())

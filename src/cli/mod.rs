@@ -1,11 +1,13 @@
 mod args;
 mod check;
 mod hooks;
+mod templates;
 mod update;
 mod watch;
 
 pub use args::{Args, Command, HooksAction};
 pub use check::run_check;
 pub use hooks::{install_hooks, remove_hooks};
+pub use templates::run_templates;
 pub use update::run_update;
 pub use watch::run_watch;

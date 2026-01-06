@@ -5,6 +5,7 @@ mod index;
 mod memory;
 mod module_content;
 mod outline;
+mod templates;
 
 pub use agent::{generate_agent_md, AgentConfig, ProjectSize};
 pub use file_doc::{
@@ -16,3 +17,4 @@ pub use index::{detect_entry_points, generate_index_md, IndexConfig};
 pub use memory::{generate_memory, get_critical_files};
 pub use module_content::generate_module_content;
 pub use outline::generate_outline;
+pub use templates::{generate_template, parse_template_types, TemplateConfig, TemplateType};

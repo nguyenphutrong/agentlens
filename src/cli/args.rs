@@ -24,6 +24,9 @@ pub enum Command {
         /// Install git hooks
         #[arg(long)]
         hooks: bool,
+        /// Generate AI tool templates (cursor, claude, opencode, or all)
+        #[arg(long, value_name = "TOOLS")]
+        templates: Option<Option<String>>,
     },
 }
 
