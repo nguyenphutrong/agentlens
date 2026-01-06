@@ -23,16 +23,30 @@ pub fn generate_module_content(
         .filter(|f| module.files.contains(&f.relative_path))
         .collect();
 
+    let outline = generate_module_outline(module, symbols);
+    let memory_content = generate_module_memory(module, memory);
+    let imports = generate_module_imports(module, graph);
+
+    let has_outline = !outline.is_empty();
+    let has_memory = !memory_content.is_empty();
+    let has_imports = !imports.is_empty();
+
     ModuleContent {
-        module_md: generate_module_md(module, &module_files),
-        outline: generate_module_outline(module, symbols),
-        memory: generate_module_memory(module, memory),
-        imports: generate_module_imports(module, graph),
+        module_md: generate_module_md(module, &module_files, has_outline, has_memory, has_imports),
+        outline,
+        memory: memory_content,
+        imports,
     }
 }
 
 /// Generate MODULE.md content
-fn generate_module_md(module: &ModuleInfo, files: &[&FileEntry]) -> String {
+fn generate_module_md(
+    module: &ModuleInfo,
+    files: &[&FileEntry],
+    has_outline: bool,
+    has_memory: bool,
+    has_imports: bool,
+) -> String {
     let mut output = String::new();
 
     // Header
@@ -83,22 +97,25 @@ fn generate_module_md(module: &ModuleInfo, files: &[&FileEntry]) -> String {
         output.push('\n');
     }
 
-    // Links to other docs
-    output.push_str("## Documentation\n\n");
-    output.push_str("- [outline.md](outline.md) - Symbol maps for large files\n");
-    output.push_str("- [memory.md](memory.md) - Warnings and TODOs\n");
-    output.push_str("- [imports.md](imports.md) - Dependencies\n");
+    if has_outline || has_memory || has_imports {
+        output.push_str("## Documentation\n\n");
+        if has_outline {
+            output.push_str("- [outline.md](outline.md) - Symbol maps for large files\n");
+        }
+        if has_memory {
+            output.push_str("- [memory.md](memory.md) - Warnings and TODOs\n");
+        }
+        if has_imports {
+            output.push_str("- [imports.md](imports.md) - Dependencies\n");
+        }
+    }
 
     output
 }
 
 /// Generate module-scoped outline.md
+/// Returns empty string if no large files with symbols exist (skips file creation)
 fn generate_module_outline(module: &ModuleInfo, symbols: &[(FileEntry, Vec<Symbol>)]) -> String {
-    let mut output = String::new();
-
-    output.push_str("# Outline\n\n");
-    output.push_str("[← Back to MODULE](MODULE.md) | [← Back to INDEX](../../INDEX.md)\n\n");
-
     // Filter to only files in this module
     let module_symbols: Vec<_> = symbols
         .iter()
@@ -106,9 +123,13 @@ fn generate_module_outline(module: &ModuleInfo, symbols: &[(FileEntry, Vec<Symbo
         .collect();
 
     if module_symbols.is_empty() {
-        output.push_str("_No large files in this module._\n");
-        return output;
+        return String::new();
     }
+
+    let mut output = String::new();
+
+    output.push_str("# Outline\n\n");
+    output.push_str("[← Back to MODULE](MODULE.md) | [← Back to INDEX](../../INDEX.md)\n\n");
 
     output.push_str(&format!(
         "Symbol maps for {} large files in this module.\n\n",
@@ -142,12 +163,8 @@ fn generate_module_outline(module: &ModuleInfo, symbols: &[(FileEntry, Vec<Symbo
 }
 
 /// Generate module-scoped memory.md
+/// Returns empty string if no memory markers exist (skips file creation)
 fn generate_module_memory(module: &ModuleInfo, memory: &[MemoryEntry]) -> String {
-    let mut output = String::new();
-
-    output.push_str("# Memory\n\n");
-    output.push_str("[← Back to MODULE](MODULE.md) | [← Back to INDEX](../../INDEX.md)\n\n");
-
     // Filter to only entries in this module
     let module_memory: Vec<_> = memory
         .iter()
@@ -155,9 +172,13 @@ fn generate_module_memory(module: &ModuleInfo, memory: &[MemoryEntry]) -> String
         .collect();
 
     if module_memory.is_empty() {
-        output.push_str("_No memory markers in this module._\n");
-        return output;
+        return String::new();
     }
+
+    let mut output = String::new();
+
+    output.push_str("# Memory\n\n");
+    output.push_str("[← Back to MODULE](MODULE.md) | [← Back to INDEX](../../INDEX.md)\n\n");
 
     // Count by priority
     let high = module_memory
@@ -326,11 +347,28 @@ mod tests {
         let files = vec![make_file("src/analyze/mod.rs", 100)];
         let file_refs: Vec<&FileEntry> = files.iter().collect();
 
-        let result = generate_module_md(&module, &file_refs);
+        let result = generate_module_md(&module, &file_refs, true, true, true);
 
         assert!(result.contains("# Module: src/analyze"));
         assert!(result.contains("Back to INDEX"));
         assert!(result.contains("src/analyze/mod.rs"));
+        assert!(result.contains("outline.md"));
+        assert!(result.contains("memory.md"));
+        assert!(result.contains("imports.md"));
+    }
+
+    #[test]
+    fn test_generate_module_md_no_docs() {
+        let module = make_module("src/analyze", vec!["src/analyze/mod.rs".to_string()]);
+        let files = vec![make_file("src/analyze/mod.rs", 100)];
+        let file_refs: Vec<&FileEntry> = files.iter().collect();
+
+        let result = generate_module_md(&module, &file_refs, false, false, false);
+
+        assert!(result.contains("# Module: src/analyze"));
+        assert!(!result.contains("outline.md"));
+        assert!(!result.contains("memory.md"));
+        assert!(!result.contains("imports.md"));
     }
 
     #[test]
@@ -340,7 +378,7 @@ mod tests {
 
         let result = generate_module_outline(&module, &symbols);
 
-        assert!(result.contains("No large files"));
+        assert!(result.is_empty());
     }
 
     #[test]
@@ -350,7 +388,7 @@ mod tests {
 
         let result = generate_module_memory(&module, &memory);
 
-        assert!(result.contains("No memory markers"));
+        assert!(result.is_empty());
     }
 
     #[test]
