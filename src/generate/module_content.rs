@@ -10,6 +10,28 @@ use crate::analyze::{FileGraph, ModuleInfo};
 use crate::emit::ModuleContent;
 use crate::types::{FileEntry, MemoryEntry, Priority, Symbol};
 
+const INLINE_THRESHOLD: usize = 500;
+
+/// Content that may be inlined or in separate file
+struct SectionContent {
+    content: String,
+    should_inline: bool,
+}
+
+impl SectionContent {
+    fn new(content: String) -> Self {
+        let should_inline = !content.is_empty() && content.len() < INLINE_THRESHOLD;
+        Self {
+            content,
+            should_inline,
+        }
+    }
+
+    fn has_separate_file(&self) -> bool {
+        !self.content.is_empty() && !self.should_inline
+    }
+}
+
 /// Generate all content for a single module
 pub fn generate_module_content(
     module: &ModuleInfo,
@@ -23,19 +45,29 @@ pub fn generate_module_content(
         .filter(|f| module.files.contains(&f.relative_path))
         .collect();
 
-    let outline = generate_module_outline(module, symbols);
-    let memory_content = generate_module_memory(module, memory);
-    let imports = generate_module_imports(module, graph);
+    let outline = SectionContent::new(generate_module_outline(module, symbols));
+    let memory_content = SectionContent::new(generate_module_memory(module, memory));
+    let imports = SectionContent::new(generate_module_imports(module, graph));
 
-    let has_outline = !outline.is_empty();
-    let has_memory = !memory_content.is_empty();
-    let has_imports = !imports.is_empty();
+    let module_md = generate_module_md(module, &module_files, &outline, &memory_content, &imports);
 
     ModuleContent {
-        module_md: generate_module_md(module, &module_files, has_outline, has_memory, has_imports),
-        outline,
-        memory: memory_content,
-        imports,
+        module_md,
+        outline: if outline.has_separate_file() {
+            outline.content
+        } else {
+            String::new()
+        },
+        memory: if memory_content.has_separate_file() {
+            memory_content.content
+        } else {
+            String::new()
+        },
+        imports: if imports.has_separate_file() {
+            imports.content
+        } else {
+            String::new()
+        },
     }
 }
 
@@ -43,9 +75,9 @@ pub fn generate_module_content(
 fn generate_module_md(
     module: &ModuleInfo,
     files: &[&FileEntry],
-    has_outline: bool,
-    has_memory: bool,
-    has_imports: bool,
+    outline: &SectionContent,
+    memory: &SectionContent,
+    imports: &SectionContent,
 ) -> String {
     let mut output = String::new();
 
@@ -97,20 +129,45 @@ fn generate_module_md(
         output.push('\n');
     }
 
-    if has_outline || has_memory || has_imports {
+    let has_separate_files =
+        outline.has_separate_file() || memory.has_separate_file() || imports.has_separate_file();
+
+    if has_separate_files {
         output.push_str("## Documentation\n\n");
-        if has_outline {
+        if outline.has_separate_file() {
             output.push_str("- [outline.md](outline.md) - Symbol maps for large files\n");
         }
-        if has_memory {
+        if memory.has_separate_file() {
             output.push_str("- [memory.md](memory.md) - Warnings and TODOs\n");
         }
-        if has_imports {
+        if imports.has_separate_file() {
             output.push_str("- [imports.md](imports.md) - Dependencies\n");
         }
+        output.push('\n');
+    }
+
+    if outline.should_inline {
+        output.push_str("---\n\n");
+        output.push_str(&strip_navigation_header(&outline.content));
+    }
+    if memory.should_inline {
+        output.push_str("---\n\n");
+        output.push_str(&strip_navigation_header(&memory.content));
+    }
+    if imports.should_inline {
+        output.push_str("---\n\n");
+        output.push_str(&strip_navigation_header(&imports.content));
     }
 
     output
+}
+
+fn strip_navigation_header(content: &str) -> String {
+    content
+        .lines()
+        .skip_while(|line| line.starts_with('#') || line.starts_with('[') || line.is_empty())
+        .collect::<Vec<_>>()
+        .join("\n")
 }
 
 /// Generate module-scoped outline.md
@@ -342,12 +399,25 @@ mod tests {
     }
 
     #[test]
-    fn test_generate_module_md() {
+    fn test_generate_module_md_with_separate_files() {
         let module = make_module("src/analyze", vec!["src/analyze/mod.rs".to_string()]);
         let files = vec![make_file("src/analyze/mod.rs", 100)];
         let file_refs: Vec<&FileEntry> = files.iter().collect();
 
-        let result = generate_module_md(&module, &file_refs, true, true, true);
+        let outline = SectionContent {
+            content: "x".repeat(600),
+            should_inline: false,
+        };
+        let memory = SectionContent {
+            content: "x".repeat(600),
+            should_inline: false,
+        };
+        let imports = SectionContent {
+            content: "x".repeat(600),
+            should_inline: false,
+        };
+
+        let result = generate_module_md(&module, &file_refs, &outline, &memory, &imports);
 
         assert!(result.contains("# Module: src/analyze"));
         assert!(result.contains("Back to INDEX"));
@@ -358,12 +428,52 @@ mod tests {
     }
 
     #[test]
+    fn test_generate_module_md_with_inline_content() {
+        let module = make_module("src/analyze", vec!["src/analyze/mod.rs".to_string()]);
+        let files = vec![make_file("src/analyze/mod.rs", 100)];
+        let file_refs: Vec<&FileEntry> = files.iter().collect();
+
+        let imports_content = "# Imports\n\n[nav]\n\nExternal: crate_a".to_string();
+        let outline = SectionContent {
+            content: String::new(),
+            should_inline: false,
+        };
+        let memory = SectionContent {
+            content: String::new(),
+            should_inline: false,
+        };
+        let imports = SectionContent {
+            content: imports_content,
+            should_inline: true,
+        };
+
+        let result = generate_module_md(&module, &file_refs, &outline, &memory, &imports);
+
+        assert!(result.contains("# Module: src/analyze"));
+        assert!(!result.contains("imports.md"));
+        assert!(result.contains("External: crate_a"));
+    }
+
+    #[test]
     fn test_generate_module_md_no_docs() {
         let module = make_module("src/analyze", vec!["src/analyze/mod.rs".to_string()]);
         let files = vec![make_file("src/analyze/mod.rs", 100)];
         let file_refs: Vec<&FileEntry> = files.iter().collect();
 
-        let result = generate_module_md(&module, &file_refs, false, false, false);
+        let outline = SectionContent {
+            content: String::new(),
+            should_inline: false,
+        };
+        let memory = SectionContent {
+            content: String::new(),
+            should_inline: false,
+        };
+        let imports = SectionContent {
+            content: String::new(),
+            should_inline: false,
+        };
+
+        let result = generate_module_md(&module, &file_refs, &outline, &memory, &imports);
 
         assert!(result.contains("# Module: src/analyze"));
         assert!(!result.contains("outline.md"));
