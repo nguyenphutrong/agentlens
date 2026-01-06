@@ -16,6 +16,15 @@ pub enum Command {
         #[command(subcommand)]
         action: HooksAction,
     },
+    /// Initialize agentmap configuration file
+    Init {
+        /// Create agentmap.toml with default settings
+        #[arg(long)]
+        config: bool,
+        /// Install git hooks
+        #[arg(long)]
+        hooks: bool,
+    },
 }
 
 #[derive(Subcommand, Debug, Clone)]
@@ -109,9 +118,67 @@ pub struct Args {
     /// Force regenerate all modules (ignore cache)
     #[arg(long, default_value = "false")]
     pub force: bool,
+
+    /// Path to config file
+    #[arg(long, value_name = "FILE")]
+    pub config: Option<PathBuf>,
 }
 
 impl Args {
+    pub fn with_config(mut self) -> Self {
+        use crate::config::Config;
+
+        let config_path = self.config.clone();
+        let project_path = &self.path;
+
+        let config = if let Some(path) = config_path {
+            Config::load_from_path(&path)
+        } else {
+            Config::load(project_path)
+        };
+
+        if let Some(cfg) = config {
+            if let Some(output) = cfg.output {
+                if self.output == PathBuf::from(".agentmap") {
+                    self.output = PathBuf::from(output);
+                }
+            }
+            if let Some(threshold) = cfg.threshold {
+                if self.threshold == 500 {
+                    self.threshold = threshold;
+                }
+            }
+            if let Some(complex) = cfg.complex_threshold {
+                if self.complex_threshold == 1000 {
+                    self.complex_threshold = complex;
+                }
+            }
+            if let Some(module_depth) = cfg.module_depth {
+                if self.module_depth == 3 {
+                    self.module_depth = module_depth;
+                }
+            }
+            if let Some(depth) = cfg.depth {
+                if self.depth == 0 {
+                    self.depth = depth;
+                }
+            }
+            if !cfg.ignore.is_empty() && self.ignore.is_empty() {
+                self.ignore = cfg.ignore;
+            }
+            if !cfg.lang.is_empty() && self.lang.is_empty() {
+                self.lang = cfg.lang;
+            }
+            if let Some(no_gitignore) = cfg.no_gitignore {
+                if !self.no_gitignore {
+                    self.no_gitignore = no_gitignore;
+                }
+            }
+        }
+
+        self
+    }
+
     pub fn verbosity(&self) -> u8 {
         if self.quiet {
             0

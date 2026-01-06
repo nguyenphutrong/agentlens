@@ -23,13 +23,17 @@ use agentmap::scan::{
     DiffStat,
 };
 use agentmap::types::{FileEntry, MemoryEntry, Symbol};
+use agentmap::Config;
 
 fn main() -> Result<()> {
     let args = Args::parse();
 
-    match &args.command {
+    match args.command.clone() {
         Some(Command::Update) => return run_update(),
-        Some(Command::Watch { debounce }) => return run_watch(&args, *debounce),
+        Some(Command::Watch { debounce }) => {
+            let args = args.with_config();
+            return run_watch(&args, debounce);
+        }
         Some(Command::Hooks { action }) => {
             let path = args.path.canonicalize().unwrap_or(args.path.clone());
             return match action {
@@ -37,8 +41,14 @@ fn main() -> Result<()> {
                 HooksAction::Remove => remove_hooks(&path),
             };
         }
+        Some(Command::Init { config, hooks }) => {
+            let path = args.path.canonicalize().unwrap_or(args.path.clone());
+            return run_init(&path, config, hooks);
+        }
         None => {}
     }
+
+    let args = args.with_config();
 
     args.validate()
         .map_err(|e| anyhow::anyhow!(e))
@@ -420,6 +430,33 @@ fn run_hierarchical_output(
                 output.files.len()
             );
         }
+    }
+
+    Ok(())
+}
+
+fn run_init(path: &std::path::Path, config: bool, hooks: bool) -> Result<()> {
+    let mut did_something = false;
+
+    if config {
+        match Config::create_default_file(path) {
+            Ok(config_path) => {
+                eprintln!("Created: {}", config_path.display());
+                did_something = true;
+            }
+            Err(e) => eprintln!("Failed to create config: {}", e),
+        }
+    }
+
+    if hooks {
+        install_hooks(path)?;
+        did_something = true;
+    }
+
+    if !did_something {
+        eprintln!("Usage: agentmap init [--config] [--hooks]");
+        eprintln!("  --config  Create agentmap.toml with default settings");
+        eprintln!("  --hooks   Install git hooks for automatic regeneration");
     }
 
     Ok(())
