@@ -11,10 +11,10 @@ use crate::emit::{
     calculate_module_state, current_timestamp, write_hierarchical, HierarchicalOutput, Manifest,
 };
 use crate::generate::{
-    detect_entry_points, file_path_to_slug, generate_file_doc, generate_index_md,
-    generate_module_content, is_complex_file, IndexConfig,
+    detect_entry_points, file_path_to_slug, generate_agent_md, generate_file_doc,
+    generate_index_md, generate_module_content, is_complex_file, AgentConfig, IndexConfig,
 };
-use crate::scan::{get_default_branch, get_diff_files, is_git_repo, scan_directory};
+use crate::scan::{get_default_branch, get_diff_files, get_git_head, is_git_repo, scan_directory};
 use crate::types::{FileEntry, MemoryEntry, Symbol};
 
 pub fn run_analysis(args: &Args, work_path: &Path) -> Result<()> {
@@ -72,6 +72,7 @@ pub fn run_analysis(args: &Args, work_path: &Path) -> Result<()> {
 
     run_hierarchical_output(
         args,
+        work_path,
         &output_path,
         &files,
         &all_symbols,
@@ -142,6 +143,7 @@ fn analyze_files(files: &[FileEntry]) -> Result<AnalysisResult> {
 #[allow(clippy::too_many_arguments)]
 fn run_hierarchical_output(
     args: &Args,
+    work_path: &Path,
     output_path: &Path,
     files: &[FileEntry],
     all_symbols: &HashMap<String, Vec<Symbol>>,
@@ -220,6 +222,23 @@ fn run_hierarchical_output(
     let index_md = generate_index_md(&index_config);
     let mut output = HierarchicalOutput::new(index_md);
 
+    let warning_count = all_memory
+        .iter()
+        .filter(|m| m.priority == crate::types::Priority::High)
+        .count();
+
+    let git_head = get_git_head(work_path);
+    let agent_config = AgentConfig {
+        modules: &modules,
+        total_files: files.len(),
+        warning_count,
+        git_head: git_head.as_deref(),
+        generated_at: current_timestamp(),
+        project_name: None,
+    };
+    let agent_md = generate_agent_md(&agent_config);
+    output.set_agent_md(agent_md);
+
     let large_file_symbols: Vec<(FileEntry, Vec<Symbol>)> = files
         .iter()
         .filter(|f| f.is_large)
@@ -285,6 +304,9 @@ fn run_hierarchical_output(
     if args.verbosity() > 0 && !args.dry_run {
         eprintln!("\nGenerated hierarchical structure:");
         eprintln!("  {}/INDEX.md", output_path.display());
+        if output.agent_md.is_some() {
+            eprintln!("  {}/AGENT.md", output_path.display());
+        }
         eprintln!(
             "  {}/modules/ ({} modules regenerated)",
             output_path.display(),

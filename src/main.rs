@@ -15,12 +15,13 @@ use agentmap::emit::{
     HierarchicalOutput, HubFile, JsonOutput, LargeFileEntry, Manifest, ModuleOutput, ProjectInfo,
 };
 use agentmap::generate::{
-    detect_entry_points, file_path_to_slug, generate_file_doc, generate_index_md,
-    generate_module_content, get_critical_files, is_complex_file, IndexConfig,
+    detect_entry_points, file_path_to_slug, generate_agent_md, generate_file_doc,
+    generate_index_md, generate_module_content, get_critical_files, is_complex_file, AgentConfig,
+    IndexConfig,
 };
 use agentmap::scan::{
-    cleanup_temp, clone_to_temp, get_default_branch, get_diff_files, is_git_repo, scan_directory,
-    DiffStat,
+    cleanup_temp, clone_to_temp, get_default_branch, get_diff_files, get_git_head, is_git_repo,
+    scan_directory, DiffStat,
 };
 use agentmap::types::{FileEntry, MemoryEntry, Symbol};
 use agentmap::Config;
@@ -282,7 +283,7 @@ fn run_json_output(
 #[allow(clippy::too_many_arguments)]
 fn run_hierarchical_output(
     args: &Args,
-    _work_path: &std::path::Path,
+    work_path: &std::path::Path,
     output_path: &std::path::Path,
     files: &[FileEntry],
     all_symbols: &HashMap<String, Vec<Symbol>>,
@@ -361,6 +362,23 @@ fn run_hierarchical_output(
     let index_md = generate_index_md(&index_config);
     let mut output = HierarchicalOutput::new(index_md);
 
+    let warning_count = all_memory
+        .iter()
+        .filter(|m| m.priority == agentmap::types::Priority::High)
+        .count();
+
+    let git_head = get_git_head(work_path);
+    let agent_config = AgentConfig {
+        modules: &modules,
+        total_files: files.len(),
+        warning_count,
+        git_head: git_head.as_deref(),
+        generated_at: current_timestamp(),
+        project_name: None,
+    };
+    let agent_md = generate_agent_md(&agent_config);
+    output.set_agent_md(agent_md);
+
     let large_file_symbols: Vec<(FileEntry, Vec<Symbol>)> = files
         .iter()
         .filter(|f| f.is_large)
@@ -426,6 +444,9 @@ fn run_hierarchical_output(
     if args.verbosity() > 0 && !args.dry_run {
         eprintln!("\nGenerated hierarchical structure:");
         eprintln!("  {}/INDEX.md", output_path.display());
+        if output.agent_md.is_some() {
+            eprintln!("  {}/AGENT.md", output_path.display());
+        }
         eprintln!(
             "  {}/modules/ ({} modules regenerated)",
             output_path.display(),

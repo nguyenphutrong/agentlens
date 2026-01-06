@@ -39,6 +39,20 @@ pub fn is_git_repo(path: &Path) -> bool {
         .unwrap_or(false)
 }
 
+pub fn get_git_head(path: &Path) -> Option<String> {
+    let output = Command::new("git")
+        .args(["rev-parse", "--short=7", "HEAD"])
+        .current_dir(path)
+        .output()
+        .ok()?;
+
+    if output.status.success() {
+        Some(String::from_utf8_lossy(&output.stdout).trim().to_string())
+    } else {
+        None
+    }
+}
+
 pub fn get_default_branch(path: &Path) -> Option<String> {
     let output = Command::new("git")
         .args(["symbolic-ref", "refs/remotes/origin/HEAD", "--short"])

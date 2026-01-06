@@ -23,6 +23,8 @@ pub struct ModuleContent {
 pub struct HierarchicalOutput {
     /// INDEX.md content (global routing table)
     pub index_md: String,
+    /// AGENT.md content (AI agent instructions)
+    pub agent_md: Option<String>,
     /// Per-module content, keyed by module slug
     pub modules: HashMap<String, ModuleContent>,
     /// Optional L2 file-level docs, keyed by file slug
@@ -33,9 +35,14 @@ impl HierarchicalOutput {
     pub fn new(index_md: String) -> Self {
         Self {
             index_md,
+            agent_md: None,
             modules: HashMap::new(),
             files: HashMap::new(),
         }
+    }
+
+    pub fn set_agent_md(&mut self, content: String) {
+        self.agent_md = Some(content);
     }
 
     /// Add content for a module
@@ -50,27 +57,28 @@ impl HierarchicalOutput {
 
     /// Count total files that would be written
     pub fn file_count(&self) -> usize {
-        // INDEX.md + (up to 4 files per module) + L2 files
-        1 + self
-            .modules
-            .values()
-            .map(|m| {
-                let mut count = 0;
-                if !m.module_md.is_empty() {
-                    count += 1;
-                }
-                if !m.outline.is_empty() {
-                    count += 1;
-                }
-                if !m.memory.is_empty() {
-                    count += 1;
-                }
-                if !m.imports.is_empty() {
-                    count += 1;
-                }
-                count
-            })
-            .sum::<usize>()
+        let agent_count = if self.agent_md.is_some() { 1 } else { 0 };
+        1 + agent_count
+            + self
+                .modules
+                .values()
+                .map(|m| {
+                    let mut count = 0;
+                    if !m.module_md.is_empty() {
+                        count += 1;
+                    }
+                    if !m.outline.is_empty() {
+                        count += 1;
+                    }
+                    if !m.memory.is_empty() {
+                        count += 1;
+                    }
+                    if !m.imports.is_empty() {
+                        count += 1;
+                    }
+                    count
+                })
+                .sum::<usize>()
             + self.files.len()
     }
 }
@@ -89,6 +97,10 @@ pub fn write_hierarchical(
     fs::create_dir_all(output_dir)?;
 
     fs::write(output_dir.join("INDEX.md"), &output.index_md)?;
+
+    if let Some(ref agent_md) = output.agent_md {
+        fs::write(output_dir.join("AGENT.md"), agent_md)?;
+    }
 
     let modules_dir = output_dir.join("modules");
     if !output.modules.is_empty() {
@@ -130,6 +142,10 @@ fn print_hierarchical_dry_run(output_dir: &Path, output: &HierarchicalOutput) {
     println!("Dry run mode - hierarchical structure:");
     println!("  {}/", output_dir.display());
     println!("  ├── INDEX.md ({} bytes)", output.index_md.len());
+
+    if let Some(ref agent_md) = output.agent_md {
+        println!("  ├── AGENT.md ({} bytes)", agent_md.len());
+    }
 
     if !output.modules.is_empty() {
         println!("  ├── modules/");

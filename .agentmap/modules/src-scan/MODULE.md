@@ -11,8 +11,8 @@
 | File | Lines | Large |
 | ---- | ----- | ----- |
 | `src/scan/filter.rs` | 40 |  |
-| `src/scan/git.rs` | 155 |  |
-| `src/scan/mod.rs` | 9 |  |
+| `src/scan/git.rs` | 169 |  |
+| `src/scan/mod.rs` | 11 |  |
 | `src/scan/remote.rs` | 86 |  |
 | `src/scan/walker.rs` | 128 |  |
 

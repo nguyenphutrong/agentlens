@@ -12,8 +12,8 @@
 | ---- | ----- | ----- |
 | `src/config.rs` | 165 |  |
 | `src/lib.rs` | 13 |  |
-| `src/main.rs` | 471 |  |
-| `src/runner.rs` | 305 |  |
+| `src/main.rs` | 492 |  |
+| `src/runner.rs` | 325 |  |
 
 ## Child Modules
 

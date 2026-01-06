@@ -13,7 +13,7 @@
 | `src/emit/json.rs` | 113 |  |
 | `src/emit/manifest.rs` | 217 |  |
 | `src/emit/mod.rs` | 9 |  |
-| `src/emit/writer.rs` | 224 |  |
+| `src/emit/writer.rs` | 240 |  |
 
 ---
 
