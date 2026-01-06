@@ -8,6 +8,7 @@ This file contains symbol maps for large files in the codebase.
 - [OrderService.java](#orderservice-java) (60 lines, 12 symbols)
 - [example.c](#example-c) (35 lines, 6 symbols)
 - [example.cpp](#example-cpp) (62 lines, 7 symbols)
+- [example.dart](#example-dart) (50 lines, 6 symbols)
 - [example.rb](#example-rb) (44 lines, 11 symbols)
 - [order.php](#order-php) (100 lines, 10 symbols)
 
@@ -103,6 +104,24 @@ This file contains symbol maps for large files in the codebase.
 - `class Player` (L30)
 - `class Container` (L45)
 - `int main()` (L58)
+
+---
+
+## example.dart (50 lines)
+
+| Line | Kind | Name | Visibility |
+| ---- | ---- | ---- | ---------- |
+| 4 | class | BaseWidget | pub |
+| 8 | trait | LoggerMixin | pub |
+| 14 | mod | StringExtensions | pub |
+| 21 | enum | OrderStatus | pub |
+| 28 | class | OrderController | pub |
+| 45 | class | _PrivateWidget | (private) |
+
+### Key Entry Points
+
+- `abstract class BaseWidget` (L4)
+- `class OrderController` (L28)
 
 ---
 

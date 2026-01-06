@@ -1,6 +1,7 @@
 mod c;
 mod cpp;
 mod csharp;
+mod dart;
 mod go;
 mod java;
 mod javascript;
@@ -12,6 +13,7 @@ mod rust;
 pub use c::CParser;
 pub use cpp::CppParser;
 pub use csharp::CSharpParser;
+pub use dart::DartParser;
 pub use go::GoParser;
 pub use java::JavaParser;
 pub use javascript::JavaScriptParser;
@@ -38,6 +40,7 @@ pub fn get_parser(language: Language) -> Option<Box<dyn LanguageParser>> {
         Language::C => Some(Box::new(CParser)),
         Language::Cpp => Some(Box::new(CppParser)),
         Language::Ruby => Some(Box::new(RubyParser)),
+        Language::Dart => Some(Box::new(DartParser)),
         Language::Unknown => None,
     }
 }

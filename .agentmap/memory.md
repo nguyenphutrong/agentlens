@@ -6,9 +6,9 @@ This file contains extracted knowledge markers from the codebase.
 
 | Category | Count | High | Medium | Low |
 | -------- | ----- | ---- | ------ | --- |
-| ⚠️ Warnings | 9 | 9 | 0 | 0 |
+| ⚠️ Warnings | 10 | 10 | 0 | 0 |
 | 📋 Business Rules | 4 | 4 | 0 | 0 |
-| 🔧 Technical Debt | 10 | 0 | 10 | 0 |
+| 🔧 Technical Debt | 11 | 0 | 11 | 0 |
 | 📝 Notes | 2 | 0 | 0 | 2 |
 
 ---
@@ -34,6 +34,10 @@ This file contains extracted knowledge markers from the codebase.
 ### 🔴 `WARNING` (example.cpp:35)
 
 > Performance critical
+
+### 🔴 `WARNING` (example.dart:31)
+
+> This is not thread-safe
 
 ### 🔴 `WARNING` (example.rb:12)
 
@@ -98,6 +102,10 @@ This file contains extracted knowledge markers from the codebase.
 ### 🟡 `TODO` (example.cpp:4)
 
 > Implement caching
+
+### 🟡 `TODO` (example.dart:3)
+
+> Add proper state management
 
 ### 🟡 `TODO` (example.rb:1)
 

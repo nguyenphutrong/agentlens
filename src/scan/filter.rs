@@ -29,6 +29,7 @@ pub fn should_include_file(path: &Path, allowed_languages: &[String]) -> bool {
         Language::C => "c",
         Language::Cpp => "cpp",
         Language::Ruby => "ruby",
+        Language::Dart => "dart",
         Language::Unknown => return false,
     };
 
