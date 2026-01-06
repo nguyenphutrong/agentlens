@@ -134,6 +134,9 @@ Options:
   -d, --depth <DEPTH>                Max directory depth (0 = unlimited)
       --diff <REF>                   So sánh với git branch/commit
       --json                         Output JSON ra stdout
+      --check                        Kiểm tra docs có stale không (exit 1 nếu cần regenerate)
+      --config <FILE>                Đường dẫn config file
+      --force                        Force regenerate tất cả modules (bỏ qua cache)
   -i, --ignore <IGNORE>              Patterns bổ sung để bỏ qua
   -l, --lang <LANG>                  Lọc theo ngôn ngữ
       --no-gitignore                 Không tuân theo .gitignore
@@ -142,6 +145,101 @@ Options:
   -q, --quiet                        Không hiển thị output
   -h, --help                         In help
   -V, --version                      In version
+
+Commands:
+  watch   Theo dõi file changes và tự động regenerate docs
+  hooks   Quản lý git hooks cho auto-regeneration
+  init    Khởi tạo cấu hình agentmap
+  update  Cập nhật agentmap lên phiên bản mới nhất
+```
+
+## Watch Mode
+
+Giữ docs luôn đồng bộ trong quá trình development:
+
+```bash
+# Bắt đầu theo dõi changes (regenerate khi save file)
+agentmap watch
+
+# Tuỳ chỉnh debounce delay (mặc định: 300ms)
+agentmap watch --debounce 500
+```
+
+Watch mode tận dụng hệ thống manifest incremental, nên chỉ modules thay đổi được regenerate.
+
+## Git Hooks
+
+Tự động regenerate docs tại các git events quan trọng:
+
+```bash
+# Cài hooks (pre-commit, post-checkout, post-merge)
+agentmap hooks install
+
+# Gỡ hooks
+agentmap hooks remove
+
+# Bỏ qua hooks tạm thời
+AGENTMAP_SKIP=1 git commit -m "quick fix"
+```
+
+Các hooks được cài:
+- **pre-commit**: Regenerate docs và stage `.agentmap/`
+- **post-checkout**: Regenerate sau khi đổi branch (chạy nền)
+- **post-merge**: Regenerate sau pull/merge (chạy nền)
+
+## Configuration File
+
+Tạo `agentmap.toml` cho cài đặt riêng của project:
+
+```bash
+# Tạo config file mặc định
+agentmap init --config
+
+# Dùng config tùy chỉnh
+agentmap --config custom.toml
+```
+
+Ví dụ `agentmap.toml`:
+
+```toml
+output = ".agentmap"
+threshold = 500
+complex_threshold = 1000
+ignore = ["*.test.ts", "fixtures/", "__mocks__/"]
+
+[watch]
+debounce_ms = 300
+```
+
+CLI flags ghi đè giá trị config file.
+
+## CI Integration
+
+Validate docs freshness trong CI pipelines:
+
+```bash
+# Kiểm tra docs có stale không (exit 0 = fresh, exit 1 = stale)
+agentmap --check
+
+# Kết hợp với diff mode
+agentmap --check --diff main
+```
+
+Ví dụ GitHub Actions workflow:
+
+```yaml
+name: Check Agentmap
+on: [pull_request]
+
+jobs:
+  check:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Install agentmap
+        run: cargo install agentmap
+      - name: Check docs freshness
+        run: agentmap --check
 ```
 
 ## Module Detection

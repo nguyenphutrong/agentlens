@@ -134,6 +134,9 @@ Options:
   -d, --depth <DEPTH>                Max directory depth (0 = unlimited) [default: 0]
       --diff <REF>                   Compare against git branch/commit
       --json                         Output JSON to stdout instead of markdown files
+      --check                        Check if docs are stale (exit 1 if regeneration needed)
+      --config <FILE>                Path to config file
+      --force                        Force regenerate all modules (ignore cache)
   -i, --ignore <IGNORE>              Additional patterns to ignore
   -l, --lang <LANG>                  Filter by language
       --no-gitignore                 Don't respect .gitignore
@@ -142,6 +145,101 @@ Options:
   -q, --quiet                        Suppress all output
   -h, --help                         Print help
   -V, --version                      Print version
+
+Commands:
+  watch   Watch for file changes and regenerate docs automatically
+  hooks   Manage git hooks for automatic regeneration
+  init    Initialize agentmap configuration
+  update  Update agentmap to the latest version
+```
+
+## Watch Mode
+
+Keep documentation in sync automatically during development:
+
+```bash
+# Start watching for changes (regenerates on file save)
+agentmap watch
+
+# Custom debounce delay (default: 300ms)
+agentmap watch --debounce 500
+```
+
+Watch mode leverages the incremental manifest system, so only changed modules are regenerated.
+
+## Git Hooks
+
+Automate documentation regeneration at key git events:
+
+```bash
+# Install hooks (pre-commit, post-checkout, post-merge)
+agentmap hooks install
+
+# Remove hooks
+agentmap hooks remove
+
+# Skip hooks temporarily
+AGENTMAP_SKIP=1 git commit -m "quick fix"
+```
+
+Installed hooks:
+- **pre-commit**: Regenerates docs and stages `.agentmap/`
+- **post-checkout**: Regenerates after branch switch (background)
+- **post-merge**: Regenerates after pull/merge (background)
+
+## Configuration File
+
+Create `agentmap.toml` for project-specific settings:
+
+```bash
+# Generate default config file
+agentmap init --config
+
+# Use custom config location
+agentmap --config custom.toml
+```
+
+Example `agentmap.toml`:
+
+```toml
+output = ".agentmap"
+threshold = 500
+complex_threshold = 1000
+ignore = ["*.test.ts", "fixtures/", "__mocks__/"]
+
+[watch]
+debounce_ms = 300
+```
+
+CLI flags override config file values.
+
+## CI Integration
+
+Validate documentation freshness in CI pipelines:
+
+```bash
+# Check if docs are stale (exit 0 = fresh, exit 1 = stale)
+agentmap --check
+
+# Combine with diff mode
+agentmap --check --diff main
+```
+
+Example GitHub Actions workflow:
+
+```yaml
+name: Check Agentmap
+on: [pull_request]
+
+jobs:
+  check:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Install agentmap
+        run: cargo install agentmap
+      - name: Check docs freshness
+        run: agentmap --check
 ```
 
 ## Module Detection
