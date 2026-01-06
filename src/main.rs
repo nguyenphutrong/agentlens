@@ -10,8 +10,8 @@ use agentmap::emit::{
     ProjectInfo,
 };
 use agentmap::generate::{
-    detect_entry_points, generate_agents_md, generate_memory, generate_outline, get_critical_files,
-    AgentsConfig,
+    detect_entry_points, generate_agents_md, generate_imports, generate_memory, generate_outline,
+    get_critical_files, AgentsConfig,
 };
 use agentmap::scan::{get_default_branch, get_diff_files, is_git_repo, scan_directory, DiffStat};
 use agentmap::types::{FileEntry, MemoryEntry, Symbol};
@@ -106,6 +106,7 @@ fn main() -> Result<()> {
 
     let outline = generate_outline(&large_file_symbols);
     let memory = generate_memory(&all_memory);
+    let imports = generate_imports(&file_graph);
 
     let critical_files = get_critical_files(&all_memory);
     let entry_points = detect_entry_points(&files);
@@ -185,6 +186,7 @@ fn main() -> Result<()> {
     let bundle = OutputBundle {
         outline,
         memory,
+        imports,
         agents_md,
     };
 
@@ -201,6 +203,7 @@ fn main() -> Result<()> {
         eprintln!("\nGenerated:");
         eprintln!("  {}/outline.md", output_path.display());
         eprintln!("  {}/memory.md", output_path.display());
+        eprintln!("  {}/imports.md", output_path.display());
         eprintln!("  {}/AGENTS.md", output_path.display());
     }
 
