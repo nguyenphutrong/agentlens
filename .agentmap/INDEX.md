@@ -18,10 +18,10 @@
 
 | Module | Type | Files | Warnings | Hub |
 | ------ | ---- | ----- | -------- | --- |
-| [src](modules/src/MODULE.md) | rust | 2 | - |  |
+| [src](modules/src/MODULE.md) | rust | 4 | - |  |
 | [src/analyze](modules/src-analyze/MODULE.md) | rust | 5 | - |  |
 | [src/analyze/lang](modules/src-analyze-lang/MODULE.md) | rust | 13 | - |  |
-| [src/cli](modules/src-cli/MODULE.md) | rust | 2 | - |  |
+| [src/cli](modules/src-cli/MODULE.md) | rust | 6 | - |  |
 | [src/emit](modules/src-emit/MODULE.md) | rust | 4 | - |  |
 | [src/generate](modules/src-generate/MODULE.md) | rust | 7 | - |  |
 | [src/scan](modules/src-scan/MODULE.md) | rust | 5 | - |  |

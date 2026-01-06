@@ -122,6 +122,10 @@ pub struct Args {
     /// Path to config file
     #[arg(long, value_name = "FILE")]
     pub config: Option<PathBuf>,
+
+    /// Check if docs are stale (exit 1 if regeneration needed)
+    #[arg(long, default_value = "false")]
+    pub check: bool,
 }
 
 impl Args {

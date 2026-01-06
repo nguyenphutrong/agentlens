@@ -2,7 +2,7 @@
 
 [← Back to INDEX](../../INDEX.md)
 
-**Type:** rust | **Files:** 2
+**Type:** rust | **Files:** 4
 
 **Entry point:** `src/lib.rs`
 
@@ -10,8 +10,10 @@
 
 | File | Lines | Large |
 | ---- | ----- | ----- |
-| `src/lib.rs` | 9 |  |
-| `src/main.rs` | 411 |  |
+| `src/config.rs` | 165 |  |
+| `src/lib.rs` | 13 |  |
+| `src/main.rs` | 471 |  |
+| `src/runner.rs` | 305 |  |
 
 ## Child Modules
 
@@ -24,6 +26,13 @@
 
 ---
 
+Dependencies within this module:
+
+- `config`
+- `runner`
+
+## External Dependencies
+
 Dependencies from other modules:
 
 - `agentmap`
@@ -35,5 +44,8 @@ Dependencies from other modules:
 - `emit`
 - `generate`
 - `scan`
+- `serde`
 - `std`
+- `super`
+- `tempfile`
 - `types`

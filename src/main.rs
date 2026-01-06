@@ -8,7 +8,7 @@ use agentmap::analyze::{
     detect_modules, extract_imports, extract_memory_markers, extract_symbols, FileGraph, ModuleInfo,
 };
 use agentmap::cli::{
-    install_hooks, remove_hooks, run_update, run_watch, Args, Command, HooksAction,
+    install_hooks, remove_hooks, run_check, run_update, run_watch, Args, Command, HooksAction,
 };
 use agentmap::emit::{
     calculate_module_state, current_timestamp, write_hierarchical, CriticalFile, DiffInfo,
@@ -64,6 +64,14 @@ fn main() -> Result<()> {
     } else {
         (args.path.clone(), None)
     };
+
+    if args.check {
+        let exit_code = run_check(&args, &work_path)?;
+        if let Some(ref temp) = temp_dir {
+            cleanup_temp(temp);
+        }
+        std::process::exit(exit_code);
+    }
 
     let result = run_analysis(&args, &work_path);
 
