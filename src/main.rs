@@ -7,7 +7,7 @@ use std::fs;
 use agentmap::analyze::{
     detect_modules, extract_imports, extract_memory_markers, extract_symbols, FileGraph, ModuleInfo,
 };
-use agentmap::cli::Args;
+use agentmap::cli::{run_update, Args, Command};
 use agentmap::emit::{
     calculate_module_state, current_timestamp, write_hierarchical, CriticalFile, DiffInfo,
     HierarchicalOutput, HubFile, JsonOutput, LargeFileEntry, Manifest, ModuleOutput, ProjectInfo,
@@ -24,6 +24,10 @@ use agentmap::types::{FileEntry, MemoryEntry, Symbol};
 
 fn main() -> Result<()> {
     let args = Args::parse();
+
+    if let Some(Command::Update) = args.command {
+        return run_update();
+    }
 
     args.validate()
         .map_err(|e| anyhow::anyhow!(e))

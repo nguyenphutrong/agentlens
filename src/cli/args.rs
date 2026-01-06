@@ -1,9 +1,15 @@
-use clap::Parser;
+use clap::{Parser, Subcommand};
 use std::path::PathBuf;
+
+#[derive(Subcommand, Debug, Clone)]
+pub enum Command {
+    /// Update agentmap to the latest version
+    Update,
+}
 
 #[derive(Parser, Debug)]
 #[command(name = "agentmap")]
-#[command(version = "0.2.0")]
+#[command(version)]
 #[command(about = "Prepare codebases for AI agents by generating hierarchical documentation")]
 #[command(long_about = "
 agentmap scans your codebase and generates a hierarchical documentation structure:
@@ -22,6 +28,9 @@ efficiently navigate large codebases without context overflow.
 ")]
 #[command(author = "AgentMap Contributors")]
 pub struct Args {
+    #[command(subcommand)]
+    pub command: Option<Command>,
+
     /// Target directory or GitHub URL
     #[arg(default_value = ".")]
     pub path: PathBuf,
