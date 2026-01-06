@@ -10,6 +10,7 @@ This file contains symbol maps for large files in the codebase.
 - [example.cpp](#example-cpp) (62 lines, 7 symbols)
 - [example.dart](#example-dart) (50 lines, 6 symbols)
 - [example.rb](#example-rb) (44 lines, 11 symbols)
+- [example.swift](#example-swift) (65 lines, 13 symbols)
 - [order.php](#order-php) (100 lines, 10 symbols)
 
 ---
@@ -144,6 +145,33 @@ This file contains symbol maps for large files in the codebase.
 ### Key Entry Points
 
 - `def self.routes` (L21)
+
+---
+
+## example.swift (65 lines)
+
+| Line | Kind | Name | Visibility |
+| ---- | ---- | ---- | ---------- |
+| 4 | trait | OrderServiceProtocol | pub |
+| 5 | fn | fetchOrders | (internal) |
+| 9 | struct | Order | pub |
+| 15 | enum | OrderStatus | pub |
+| 23 | class | OrderManager | pub |
+| 27 | method | init | (private) |
+| 29 | fn | fetchOrders | pub |
+| 33 | fn | createOrder | pub |
+| 39 | mod | extension Order | (internal) |
+| 45 | class | OrderActor | (internal) |
+| 47 | fn | addOrder | (internal) |
+| 53 | struct | ContentView | (internal) |
+| 61 | method | init | (internal) |
+
+### Key Entry Points
+
+- `struct Order` (L9)
+- `class OrderManager` (L23)
+- `public func fetchOrders() async throws -> [Order]` (L29)
+- `public func createOrder(_ order: Order) async throws` (L33)
 
 ---
 

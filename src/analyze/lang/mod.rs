@@ -9,6 +9,7 @@ mod php;
 mod python;
 mod ruby;
 mod rust;
+mod swift;
 
 pub use c::CParser;
 pub use cpp::CppParser;
@@ -21,6 +22,7 @@ pub use php::PhpParser;
 pub use python::PythonParser;
 pub use ruby::RubyParser;
 pub use rust::RustParser;
+pub use swift::SwiftParser;
 
 use crate::types::{Language, Symbol};
 
@@ -41,6 +43,7 @@ pub fn get_parser(language: Language) -> Option<Box<dyn LanguageParser>> {
         Language::Cpp => Some(Box::new(CppParser)),
         Language::Ruby => Some(Box::new(RubyParser)),
         Language::Dart => Some(Box::new(DartParser)),
+        Language::Swift => Some(Box::new(SwiftParser)),
         Language::Unknown => None,
     }
 }

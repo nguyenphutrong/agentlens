@@ -33,6 +33,7 @@ These files exceed the line threshold. Use `outline.md` for symbol maps:
 | `example.cpp` | 62 | Cpp |
 | `example.dart` | 50 | Dart |
 | `example.rb` | 44 | Ruby |
+| `example.swift` | 65 | Swift |
 | `order.php` | 100 | Php |
 
 ## Critical Files (Review memory.md First)
@@ -48,6 +49,7 @@ These files contain high-priority warnings or business rules:
 | `example.cpp` | 1 |
 | `example.dart` | 1 |
 | `example.rb` | 1 |
+| `example.swift` | 1 |
 
 ---
 
