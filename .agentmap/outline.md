@@ -4,7 +4,31 @@ This file contains symbol maps for large files in the codebase.
 
 ## Table of Contents
 
+- [OrderService.java](#orderservice-java) (60 lines, 12 symbols)
 - [order.php](#order-php) (100 lines, 10 symbols)
+
+---
+
+## OrderService.java (60 lines)
+
+| Line | Kind | Name | Visibility |
+| ---- | ---- | ---- | ---------- |
+| 10 | class | OrderService | pub |
+| 13 | method | OrderService | (internal) |
+| 20 | method | createOrder | pub |
+| 27 | method | processPayment | pub |
+| 31 | method | validateRequest | (private) |
+| 38 | method | findById | pub |
+| 44 | method | findAll | pub |
+| 48 | interface | OrderRepository | (internal) |
+| 50 | method | save | (internal) |
+| 51 | method | findById | (internal) |
+| 52 | method | findAll | (internal) |
+| 54 | enum | OrderStatus | (internal) |
+
+### Key Entry Points
+
+- `public class OrderService` (L10)
 
 ---
 

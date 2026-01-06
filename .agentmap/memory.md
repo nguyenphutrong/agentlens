@@ -6,14 +6,18 @@ This file contains extracted knowledge markers from the codebase.
 
 | Category | Count | High | Medium | Low |
 | -------- | ----- | ---- | ------ | --- |
-| ⚠️ Warnings | 3 | 3 | 0 | 0 |
-| 📋 Business Rules | 2 | 2 | 0 | 0 |
-| 🔧 Technical Debt | 3 | 0 | 3 | 0 |
-| 📝 Notes | 1 | 0 | 0 | 1 |
+| ⚠️ Warnings | 4 | 4 | 0 | 0 |
+| 📋 Business Rules | 3 | 3 | 0 | 0 |
+| 🔧 Technical Debt | 5 | 0 | 5 | 0 |
+| 📝 Notes | 2 | 0 | 0 | 2 |
 
 ---
 
 ## ⚠️ Warnings
+
+### 🔴 `WARNING` (OrderService.java:19)
+
+> This method modifies the database directly
 
 ### 🔴 `WARNING` (order.php:2)
 
@@ -31,6 +35,10 @@ This file contains extracted knowledge markers from the codebase.
 
 ## 📋 Business Rules
 
+### 🔴 `RULE` (OrderService.java:33)
+
+> Orders must have at least one item
+
 ### 🔴 `RULE` (order.php:3)
 
 > All order modifications must go through validateOrder() first
@@ -42,6 +50,14 @@ This file contains extracted knowledge markers from the codebase.
 ---
 
 ## 🔧 Technical Debt
+
+### 🟡 `TODO` (OrderService.java:8)
+
+> Add caching layer for performance
+
+### 🟡 `FIXME` (OrderService.java:26)
+
+> Needs transaction support
 
 ### 🟡 `TODO` (order.php:12)
 
@@ -58,6 +74,10 @@ This file contains extracted knowledge markers from the codebase.
 ---
 
 ## 📝 Notes
+
+### 🟢 `NOTE` (OrderService.java:43)
+
+> Used for admin reporting only
 
 ### 🟢 `NOTE` (order.php:82)
 

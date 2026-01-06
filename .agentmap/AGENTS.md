@@ -27,6 +27,7 @@ These files exceed the line threshold. Use `outline.md` for symbol maps:
 
 | File | Lines | Language |
 | ---- | ----- | -------- |
+| `OrderService.java` | 60 | Java |
 | `order.php` | 100 | Php |
 
 ## Critical Files (Review memory.md First)
@@ -36,6 +37,7 @@ These files contain high-priority warnings or business rules:
 | File | High-Priority Markers |
 | ---- | --------------------- |
 | `order.php` | 5 |
+| `OrderService.java` | 2 |
 
 ---
 

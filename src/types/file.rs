@@ -8,6 +8,7 @@ pub enum Language {
     TypeScript,
     Go,
     Php,
+    Java,
     Unknown,
 }
 
@@ -20,6 +21,7 @@ impl Language {
             "ts" | "tsx" | "mts" | "cts" => Language::TypeScript,
             "go" => Language::Go,
             "php" | "phtml" => Language::Php,
+            "java" => Language::Java,
             _ => Language::Unknown,
         }
     }
