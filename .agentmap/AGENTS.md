@@ -21,35 +21,29 @@ Instructions for AI agents working with this codebase.
 
 ---
 
-## Large Files (Consult outline.md)
+## Entry Points
 
-These files exceed the line threshold. Use `outline.md` for symbol maps:
+Start reading the codebase from these files:
 
-| File | Lines | Language |
-| ---- | ----- | -------- |
-| `OrderController.cs` | 58 | CSharp |
-| `OrderService.java` | 60 | Java |
-| `example.c` | 35 | C |
-| `example.cpp` | 62 | Cpp |
-| `example.dart` | 50 | Dart |
-| `example.rb` | 44 | Ruby |
-| `example.swift` | 65 | Swift |
-| `order.php` | 100 | Php |
+- `src/lib.rs`
+- `src/main.rs`
 
-## Critical Files (Review memory.md First)
+## Hub Files (High Import Count)
 
-These files contain high-priority warnings or business rules:
+These files are imported by many others. Changes here have wide impact:
 
-| File | High-Priority Markers |
-| ---- | --------------------- |
-| `order.php` | 5 |
-| `OrderController.cs` | 3 |
-| `OrderService.java` | 2 |
-| `example.c` | 1 |
-| `example.cpp` | 1 |
-| `example.dart` | 1 |
-| `example.rb` | 1 |
-| `example.swift` | 1 |
+| File | Imported By |
+| ---- | ----------- |
+| `types` | 22 files |
+| `analyze` | 15 files |
+| `once_cell` | 13 files |
+| `regex` | 13 files |
+| `std` | 11 files |
+| `super` | 6 files |
+| `serde` | 5 files |
+| `anyhow` | 4 files |
+| `memory` | 3 files |
+| `scan` | 3 files |
 
 ---
 

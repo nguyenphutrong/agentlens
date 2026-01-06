@@ -4,7 +4,8 @@ version = "0.2.0"
 edition = "2021"
 description = "CLI tool to prepare codebases for AI agents by generating outlines, memory files, and reading rules"
 license = "MIT"
-repository = "https://github.com/user/agentmap"
+repository = "https://github.com/nguyenphutrong/agentmap"
+authors = ["Trong Nguyen <phutrong.nguyen@pm.me>"]
 keywords = ["cli", "ai", "code-analysis", "documentation"]
 categories = ["command-line-utilities", "development-tools"]
 

@@ -36,7 +36,7 @@ cargo install --path .
 ### Build Local
 
 ```bash
-git clone https://github.com/user/agentmap
+git clone https://github.com/nguyenphutrong/agentmap
 cd agentmap
 cargo build --release
 ./target/release/agentmap --help
