@@ -1,0 +1,46 @@
+{
+  "version": "0.2.0",
+  "generated_at": 1767704078,
+  "modules": {
+    "src-cli": {
+      "latest_mtime": 1767699119,
+      "file_count": 2,
+      "files_hash": 14296655923734347161
+    },
+    "src-types": {
+      "latest_mtime": 1767688204,
+      "file_count": 4,
+      "files_hash": 11790852967198125874
+    },
+    "src-scan": {
+      "latest_mtime": 1767689062,
+      "file_count": 5,
+      "files_hash": 15111640761281338415
+    },
+    "src-emit": {
+      "latest_mtime": 1767700473,
+      "file_count": 4,
+      "files_hash": 4518580010369768925
+    },
+    "src-generate": {
+      "latest_mtime": 1767702705,
+      "file_count": 7,
+      "files_hash": 2392684589501121392
+    },
+    "src-analyze-lang": {
+      "latest_mtime": 1767702811,
+      "file_count": 13,
+      "files_hash": 14406266209587732767
+    },
+    "src": {
+      "latest_mtime": 1767702849,
+      "file_count": 2,
+      "files_hash": 5294800909685159197
+    },
+    "src-analyze": {
+      "latest_mtime": 1767691798,
+      "file_count": 5,
+      "files_hash": 574728628975473698
+    }
+  }
+}
