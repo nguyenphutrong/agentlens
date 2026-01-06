@@ -1,3 +1,4 @@
+mod csharp;
 mod go;
 mod java;
 mod javascript;
@@ -5,6 +6,7 @@ mod php;
 mod python;
 mod rust;
 
+pub use csharp::CSharpParser;
 pub use go::GoParser;
 pub use java::JavaParser;
 pub use javascript::JavaScriptParser;
@@ -26,6 +28,7 @@ pub fn get_parser(language: Language) -> Option<Box<dyn LanguageParser>> {
         Language::Go => Some(Box::new(GoParser)),
         Language::Php => Some(Box::new(PhpParser)),
         Language::Java => Some(Box::new(JavaParser)),
+        Language::CSharp => Some(Box::new(CSharpParser)),
         Language::Unknown => None,
     }
 }

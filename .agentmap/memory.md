@@ -6,14 +6,22 @@ This file contains extracted knowledge markers from the codebase.
 
 | Category | Count | High | Medium | Low |
 | -------- | ----- | ---- | ------ | --- |
-| ⚠️ Warnings | 4 | 4 | 0 | 0 |
-| 📋 Business Rules | 3 | 3 | 0 | 0 |
-| 🔧 Technical Debt | 5 | 0 | 5 | 0 |
+| ⚠️ Warnings | 6 | 6 | 0 | 0 |
+| 📋 Business Rules | 4 | 4 | 0 | 0 |
+| 🔧 Technical Debt | 7 | 0 | 7 | 0 |
 | 📝 Notes | 2 | 0 | 0 | 2 |
 
 ---
 
 ## ⚠️ Warnings
+
+### 🔴 `WARNING` (OrderController.cs:16)
+
+> This endpoint modifies order state
+
+### 🔴 `SAFETY` (OrderController.cs:38)
+
+> Must validate before processing payment
 
 ### 🔴 `WARNING` (OrderService.java:19)
 
@@ -35,6 +43,10 @@ This file contains extracted knowledge markers from the codebase.
 
 ## 📋 Business Rules
 
+### 🔴 `RULE` (OrderController.cs:25)
+
+> Only order owner can view their orders
+
 ### 🔴 `RULE` (OrderService.java:33)
 
 > Orders must have at least one item
@@ -50,6 +62,14 @@ This file contains extracted knowledge markers from the codebase.
 ---
 
 ## 🔧 Technical Debt
+
+### 🟡 `TODO` (OrderController.cs:6)
+
+> Add authentication middleware
+
+### 🟡 `FIXME` (OrderController.cs:30)
+
+> Add pagination
 
 ### 🟡 `TODO` (OrderService.java:8)
 

@@ -27,6 +27,7 @@ These files exceed the line threshold. Use `outline.md` for symbol maps:
 
 | File | Lines | Language |
 | ---- | ----- | -------- |
+| `OrderController.cs` | 58 | CSharp |
 | `OrderService.java` | 60 | Java |
 | `order.php` | 100 | Php |
 
@@ -37,6 +38,7 @@ These files contain high-priority warnings or business rules:
 | File | High-Priority Markers |
 | ---- | --------------------- |
 | `order.php` | 5 |
+| `OrderController.cs` | 3 |
 | `OrderService.java` | 2 |
 
 ---

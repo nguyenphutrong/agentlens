@@ -25,6 +25,7 @@ pub fn should_include_file(path: &Path, allowed_languages: &[String]) -> bool {
         Language::Go => "go",
         Language::Php => "php",
         Language::Java => "java",
+        Language::CSharp => "csharp",
         Language::Unknown => return false,
     };
 

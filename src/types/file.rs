@@ -9,6 +9,7 @@ pub enum Language {
     Go,
     Php,
     Java,
+    CSharp,
     Unknown,
 }
 
@@ -22,6 +23,7 @@ impl Language {
             "go" => Language::Go,
             "php" | "phtml" => Language::Php,
             "java" => Language::Java,
+            "cs" => Language::CSharp,
             _ => Language::Unknown,
         }
     }
