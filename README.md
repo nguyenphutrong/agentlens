@@ -9,13 +9,14 @@
 
 ## What It Does
 
-agentmap scans your codebase and generates three files:
+agentmap scans your codebase and generates four files:
 
 | File | Purpose |
-|------|---------|
+|------|---------
 | `outline.md` | Symbol maps for large files (functions, classes, structs with line numbers) |
 | `memory.md` | Extracted knowledge markers (TODO, FIXME, WARNING, SAFETY, business rules) |
-| `AGENTS.md` | Reading instructions for AI agents (entry points, critical files, rules) |
+| `imports.md` | File dependency graph showing imports and importers for each file |
+| `AGENTS.md` | Reading instructions for AI agents (entry points, hub files, critical warnings) |
 
 ## Why?
 
@@ -60,19 +61,53 @@ agentmap --dry-run
 agentmap -v
 ```
 
+### Remote Repositories
+
+```bash
+# Analyze a GitHub repository directly
+agentmap github.com/user/repo
+agentmap https://github.com/vercel/next.js
+
+# With depth limiting for large repos
+agentmap --depth 3 github.com/facebook/react
+```
+
+### Git Diff Mode
+
+```bash
+# Show only files changed since a branch
+agentmap --diff main
+
+# Compare against a specific commit
+agentmap --diff HEAD~5
+```
+
+### JSON Output
+
+```bash
+# Output analysis as JSON (for tooling integration)
+agentmap --json > analysis.json
+
+# Combine with other flags
+agentmap --json --depth 2 github.com/user/repo
+```
+
 ### Options
 
 ```
 Usage: agentmap [OPTIONS] [PATH]
 
 Arguments:
-  [PATH]  Target directory [default: .]
+  [PATH]  Target directory or GitHub URL [default: .]
 
 Options:
   -o, --output <OUTPUT>        Output directory [default: .agentmap]
   -t, --threshold <THRESHOLD>  Line threshold for "large" files [default: 500]
+  -d, --depth <DEPTH>          Max directory depth (0 = unlimited) [default: 0]
+      --diff <REF>             Compare against git branch/commit
+      --json                   Output JSON to stdout instead of markdown files
   -i, --ignore <IGNORE>        Additional patterns to ignore
-  -l, --lang <LANG>            Filter by language (rust, python, javascript, go)
+  -l, --lang <LANG>            Filter by language
       --no-gitignore           Don't respect .gitignore
       --dry-run                Preview output without writing
   -v, --verbose...             Increase verbosity (-v, -vv, -vvv)
@@ -133,12 +168,17 @@ Options:
 
 ## Supported Languages
 
-| Language | Symbol Extraction | Memory Markers |
-|----------|-------------------|----------------|
-| Rust | ✅ Functions, structs, enums, traits, impls | ✅ |
-| Python | ✅ Functions, classes, methods | ✅ |
-| JavaScript/TypeScript | ✅ Functions, classes, arrow functions | ✅ |
-| Go | ✅ Functions, structs, interfaces, methods | ✅ |
+| Language | Symbol Extraction | Import Graph | Memory Markers |
+|----------|-------------------|--------------|----------------|
+| Rust | ✅ Functions, structs, enums, traits, impls | ✅ | ✅ |
+| Python | ✅ Functions, classes, methods | ✅ | ✅ |
+| JavaScript/TypeScript | ✅ Functions, classes, arrow functions | ✅ | ✅ |
+| Go | ✅ Functions, structs, interfaces, methods | ✅ | ✅ |
+| Swift | ✅ Functions, classes, structs, enums, protocols | ✅ | ✅ |
+| Dart | ✅ Functions, classes, mixins, extensions | ✅ | ✅ |
+| Ruby | ✅ Methods, classes, modules | ✅ | ✅ |
+| C# | ✅ Methods, classes, structs, interfaces | ✅ | ✅ |
+| Java | ✅ Methods, classes, interfaces, enums | ✅ | ✅ |
 
 ## Memory Markers
 
