@@ -83,9 +83,7 @@ pub fn run_analysis(args: &Args, work_path: &Path) -> Result<()> {
 }
 
 fn get_diff_file_set(args: &Args, work_path: &Path) -> Option<std::collections::HashSet<String>> {
-    if args.diff.is_none() {
-        return None;
-    }
+    args.diff.as_ref()?;
 
     if !is_git_repo(work_path) {
         eprintln!("Warning: --diff requires a git repository, ignoring flag");
@@ -105,14 +103,14 @@ fn get_diff_file_set(args: &Args, work_path: &Path) -> Option<std::collections::
     get_diff_files(work_path, &base_ref).map(|stats| stats.iter().map(|s| s.path.clone()).collect())
 }
 
-fn analyze_files(
-    files: &[FileEntry],
-) -> Result<(
+type AnalysisResult = (
     Vec<MemoryEntry>,
     HashMap<String, Vec<Symbol>>,
     Vec<(FileEntry, Vec<Symbol>)>,
     FileGraph,
-)> {
+);
+
+fn analyze_files(files: &[FileEntry]) -> Result<AnalysisResult> {
     let mut all_memory: Vec<MemoryEntry> = Vec::new();
     let mut all_symbols: HashMap<String, Vec<Symbol>> = HashMap::new();
     let mut large_file_symbols: Vec<(FileEntry, Vec<Symbol>)> = Vec::new();

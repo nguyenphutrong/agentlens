@@ -143,7 +143,7 @@ impl Args {
 
         if let Some(cfg) = config {
             if let Some(output) = cfg.output {
-                if self.output == PathBuf::from(".agentmap") {
+                if self.output.as_os_str() == ".agentmap" {
                     self.output = PathBuf::from(output);
                 }
             }
