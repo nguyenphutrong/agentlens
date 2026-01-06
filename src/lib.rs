@@ -3,6 +3,7 @@ pub mod cli;
 pub mod config;
 pub mod emit;
 pub mod generate;
+pub mod mcp;
 pub mod runner;
 pub mod scan;
 pub mod types;

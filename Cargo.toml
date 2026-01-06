@@ -38,6 +38,11 @@ self_update = { version = "0.41", features = ["archive-tar", "compression-flate2
 notify = "6"
 notify-debouncer-mini = "0.4"
 
+# MCP Server
+rmcp = { version = "0.12", features = ["server", "transport-io"] }
+tokio = { version = "1", features = ["full"] }
+schemars = "1.2"
+
 [dev-dependencies]
 tempfile = "3"
 assert_cmd = "2"

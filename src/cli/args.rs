@@ -28,6 +28,15 @@ pub enum Command {
         #[arg(long, value_name = "TOOLS")]
         templates: Option<Option<String>>,
     },
+    /// Start MCP server for AI tool integration
+    Serve {
+        /// Run in MCP mode (stdio transport)
+        #[arg(long)]
+        mcp: bool,
+        /// HTTP port for SSE transport (enables HTTP mode)
+        #[arg(long, value_name = "PORT")]
+        port: Option<u16>,
+    },
 }
 
 #[derive(Subcommand, Debug, Clone)]
@@ -38,7 +47,7 @@ pub enum HooksAction {
     Remove,
 }
 
-#[derive(Parser, Debug)]
+#[derive(Parser, Debug, Clone)]
 #[command(name = "agentmap")]
 #[command(version)]
 #[command(about = "Prepare codebases for AI agents by generating hierarchical documentation")]

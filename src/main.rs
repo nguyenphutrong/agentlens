@@ -8,8 +8,8 @@ use agentmap::analyze::{
     detect_modules, extract_imports, extract_memory_markers, extract_symbols, FileGraph, ModuleInfo,
 };
 use agentmap::cli::{
-    install_hooks, remove_hooks, run_check, run_templates, run_update, run_watch, Args, Command,
-    HooksAction,
+    install_hooks, remove_hooks, run_check, run_mcp_http_server, run_mcp_server, run_templates,
+    run_update, run_watch, Args, Command, HooksAction,
 };
 use agentmap::emit::{
     calculate_module_state, current_timestamp, write_hierarchical, CriticalFile, DiffInfo,
@@ -50,6 +50,24 @@ fn main() -> Result<()> {
         }) => {
             let path = args.path.canonicalize().unwrap_or(args.path.clone());
             return run_init(&path, config, hooks, templates, &args.output);
+        }
+        Some(Command::Serve { mcp, port }) => {
+            if !mcp && port.is_none() {
+                eprintln!("Usage: agentmap serve --mcp [--port PORT]");
+                eprintln!("  --mcp        Run in MCP mode (stdio transport)");
+                eprintln!("  --port PORT  Use HTTP/SSE transport on specified port");
+                std::process::exit(1);
+            }
+            let args = args.with_config();
+            let work_path = args.path.canonicalize().unwrap_or(args.path.clone());
+            let runtime = tokio::runtime::Runtime::new().expect("Failed to create Tokio runtime");
+            return runtime.block_on(async {
+                if let Some(p) = port {
+                    run_mcp_http_server(&args, &work_path, p).await
+                } else {
+                    run_mcp_server(&args, &work_path).await
+                }
+            });
         }
         None => {}
     }
