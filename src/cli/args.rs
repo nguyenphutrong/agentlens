@@ -56,6 +56,18 @@ impl Args {
     }
 
     pub fn validate(&self) -> Result<(), String> {
+        let path_str = self.path.to_string_lossy();
+        if path_str.starts_with("https://")
+            || path_str.starts_with("github.com")
+            || path_str.starts_with("gitlab.com")
+            || path_str.starts_with("git@")
+        {
+            if self.threshold == 0 {
+                return Err("Threshold must be greater than 0".to_string());
+            }
+            return Ok(());
+        }
+
         if !self.path.exists() {
             return Err(format!("Path does not exist: {}", self.path.display()));
         }
@@ -69,5 +81,13 @@ impl Args {
         }
 
         Ok(())
+    }
+
+    pub fn is_remote(&self) -> bool {
+        let path_str = self.path.to_string_lossy();
+        path_str.starts_with("https://")
+            || path_str.starts_with("github.com")
+            || path_str.starts_with("gitlab.com")
+            || path_str.starts_with("git@")
     }
 }

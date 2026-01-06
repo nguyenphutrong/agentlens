@@ -13,7 +13,10 @@ use agentmap::generate::{
     detect_entry_points, generate_agents_md, generate_imports, generate_memory, generate_outline,
     get_critical_files, AgentsConfig,
 };
-use agentmap::scan::{get_default_branch, get_diff_files, is_git_repo, scan_directory, DiffStat};
+use agentmap::scan::{
+    cleanup_temp, clone_to_temp, get_default_branch, get_diff_files, is_git_repo, scan_directory,
+    DiffStat,
+};
 use agentmap::types::{FileEntry, MemoryEntry, Symbol};
 
 fn main() -> Result<()> {
@@ -23,25 +26,46 @@ fn main() -> Result<()> {
         .map_err(|e| anyhow::anyhow!(e))
         .context("Invalid arguments")?;
 
+    let (work_path, temp_dir) = if args.is_remote() {
+        let url = args.path.to_string_lossy().to_string();
+        if args.verbosity() > 0 && !args.json {
+            eprintln!("Cloning remote repository: {}", url);
+        }
+        let temp = clone_to_temp(&url).context("Failed to clone remote repository")?;
+        (temp.clone(), Some(temp))
+    } else {
+        (args.path.clone(), None)
+    };
+
+    let result = run_analysis(&args, &work_path);
+
+    if let Some(ref temp) = temp_dir {
+        cleanup_temp(temp);
+    }
+
+    result
+}
+
+fn run_analysis(args: &Args, work_path: &std::path::Path) -> Result<()> {
     if args.verbosity() > 0 && !args.json {
-        eprintln!("Scanning: {}", args.path.display());
+        eprintln!("Scanning: {}", work_path.display());
     }
 
     let diff_stats: Option<Vec<DiffStat>> = if args.diff.is_some() {
-        if !is_git_repo(&args.path) {
+        if !is_git_repo(work_path) {
             eprintln!("Warning: --diff requires a git repository, ignoring flag");
             None
         } else {
             let base_ref_owned = args
                 .diff
                 .clone()
-                .or_else(|| get_default_branch(&args.path))
+                .or_else(|| get_default_branch(work_path))
                 .unwrap_or_else(|| "main".to_string());
 
             if args.verbosity() > 0 && !args.json {
                 eprintln!("  Diff mode: comparing against {}", base_ref_owned);
             }
-            get_diff_files(&args.path, &base_ref_owned)
+            get_diff_files(work_path, &base_ref_owned)
         }
     } else {
         None
@@ -57,7 +81,7 @@ fn main() -> Result<()> {
         None
     };
 
-    let files = scan_directory(&args.path, args.threshold, !args.no_gitignore, max_depth)
+    let files = scan_directory(work_path, args.threshold, !args.no_gitignore, max_depth)
         .context("Failed to scan directory")?;
 
     let files: Vec<_> = if let Some(ref diff_set) = diff_file_set {
@@ -120,7 +144,7 @@ fn main() -> Result<()> {
     let diff_base_ref = args
         .diff
         .clone()
-        .or_else(|| get_default_branch(&args.path))
+        .or_else(|| get_default_branch(work_path))
         .unwrap_or_else(|| "main".to_string());
 
     let agents_config = AgentsConfig {
@@ -143,7 +167,7 @@ fn main() -> Result<()> {
             version: env!("CARGO_PKG_VERSION").to_string(),
             generated_at: Utc::now(),
             project: ProjectInfo {
-                path: args.path.display().to_string(),
+                path: work_path.display().to_string(),
                 files_scanned: files.len(),
                 large_files_count: large_file_symbols.len(),
                 memory_markers_count: all_memory.len(),
@@ -194,7 +218,7 @@ fn main() -> Result<()> {
     let output_path = if args.output.is_absolute() {
         args.output.clone()
     } else {
-        args.path.join(&args.output)
+        work_path.join(&args.output)
     };
 
     write_outputs(&output_path, &bundle, args.dry_run).context("Failed to write outputs")?;
