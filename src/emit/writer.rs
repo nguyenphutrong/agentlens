@@ -117,22 +117,17 @@ pub fn write_hierarchical(
         return Ok(());
     }
 
-    // Clean up old structure if exists
-    cleanup_old_structure(output_dir)?;
+    cleanup_legacy_files(output_dir)?;
 
-    // Create base directory
     fs::create_dir_all(output_dir)?;
 
-    // Write INDEX.md
     fs::write(output_dir.join("INDEX.md"), &output.index_md)?;
 
-    // Create modules directory
     let modules_dir = output_dir.join("modules");
     if !output.modules.is_empty() {
         fs::create_dir_all(&modules_dir)?;
     }
 
-    // Write each module's content
     for (slug, content) in &output.modules {
         let module_dir = modules_dir.join(slug);
         fs::create_dir_all(&module_dir)?;
@@ -151,7 +146,6 @@ pub fn write_hierarchical(
         }
     }
 
-    // Write L2 file documentation
     if !output.files.is_empty() {
         let files_dir = output_dir.join("files");
         fs::create_dir_all(&files_dir)?;
@@ -221,31 +215,17 @@ fn print_hierarchical_dry_run(output_dir: &Path, output: &HierarchicalOutput) {
     println!("\nTotal: {} files", output.file_count());
 }
 
-/// Clean up old output structure before writing new one
-fn cleanup_old_structure(output_dir: &Path) -> Result<()> {
+fn cleanup_legacy_files(output_dir: &Path) -> Result<()> {
     if !output_dir.exists() {
         return Ok(());
     }
 
-    // Remove old flat files if they exist
-    let old_files = ["AGENTS.md", "outline.md", "memory.md", "imports.md"];
-    for file in old_files {
+    let legacy_files = ["AGENTS.md", "outline.md", "memory.md", "imports.md"];
+    for file in legacy_files {
         let path = output_dir.join(file);
         if path.exists() {
             fs::remove_file(path)?;
         }
-    }
-
-    // Remove old modules directory if exists
-    let modules_dir = output_dir.join("modules");
-    if modules_dir.exists() {
-        fs::remove_dir_all(&modules_dir)?;
-    }
-
-    // Remove old files directory if exists
-    let files_dir = output_dir.join("files");
-    if files_dir.exists() {
-        fs::remove_dir_all(&files_dir)?;
     }
 
     Ok(())

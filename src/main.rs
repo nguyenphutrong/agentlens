@@ -9,8 +9,9 @@ use agentmap::analyze::{
 };
 use agentmap::cli::Args;
 use agentmap::emit::{
-    write_hierarchical, write_outputs, CriticalFile, DiffInfo, HierarchicalOutput, HubFile,
-    JsonOutput, LargeFileEntry, ModuleOutput, OutputBundle, ProjectInfo,
+    calculate_module_state, current_timestamp, write_hierarchical, write_outputs, CriticalFile,
+    DiffInfo, HierarchicalOutput, HubFile, JsonOutput, LargeFileEntry, Manifest, ModuleOutput,
+    OutputBundle, ProjectInfo,
 };
 use agentmap::generate::{
     detect_entry_points, file_path_to_slug, generate_agents_md, generate_file_doc,
@@ -349,6 +350,39 @@ fn run_hierarchical_output(
         }
     }
 
+    let mut manifest = if args.force {
+        Manifest::default()
+    } else {
+        Manifest::load(output_path)
+    };
+
+    let module_states: HashMap<String, _> = modules
+        .iter()
+        .map(|m| {
+            let module_files: Vec<_> = files
+                .iter()
+                .filter(|f| m.files.contains(&f.relative_path))
+                .collect();
+            (m.slug.clone(), calculate_module_state(&module_files))
+        })
+        .collect();
+
+    let modules_to_regenerate: Vec<_> = modules
+        .iter()
+        .filter(|m| {
+            let state = &module_states[&m.slug];
+            manifest.needs_regeneration(&m.slug, state)
+        })
+        .collect();
+
+    if args.verbosity() > 0 && !args.force {
+        eprintln!(
+            "  Regenerating {}/{} modules",
+            modules_to_regenerate.len(),
+            modules.len()
+        );
+    }
+
     let hub_module_slugs: Vec<(String, usize)> = hub_files
         .iter()
         .filter_map(|(path, count)| {
@@ -379,7 +413,7 @@ fn run_hierarchical_output(
         })
         .collect();
 
-    for module in &modules {
+    for module in &modules_to_regenerate {
         let module_memory: Vec<_> = all_memory
             .iter()
             .filter(|m| module.files.contains(&m.source_file))
@@ -418,11 +452,24 @@ fn run_hierarchical_output(
     write_hierarchical(output_path, &output, args.dry_run)
         .context("Failed to write hierarchical outputs")?;
 
+    if !args.dry_run {
+        manifest.version = env!("CARGO_PKG_VERSION").to_string();
+        manifest.generated_at = current_timestamp();
+        for (slug, state) in module_states {
+            manifest.update_module(slug, state);
+        }
+        let current_slugs: Vec<_> = modules.iter().map(|m| m.slug.clone()).collect();
+        manifest.prune_modules(&current_slugs);
+        manifest
+            .save(output_path)
+            .context("Failed to save manifest")?;
+    }
+
     if args.verbosity() > 0 && !args.dry_run {
         eprintln!("\nGenerated hierarchical structure:");
         eprintln!("  {}/INDEX.md", output_path.display());
         eprintln!(
-            "  {}/modules/ ({} modules)",
+            "  {}/modules/ ({} modules regenerated)",
             output_path.display(),
             output.modules.len()
         );

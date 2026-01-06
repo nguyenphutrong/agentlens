@@ -81,6 +81,10 @@ pub struct Args {
     /// Use legacy flat output format (AGENTS.md, outline.md, etc.)
     #[arg(long, default_value = "false")]
     pub legacy: bool,
+
+    /// Force regenerate all modules (ignore cache)
+    #[arg(long, default_value = "false")]
+    pub force: bool,
 }
 
 impl Args {
