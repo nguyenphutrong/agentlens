@@ -5,12 +5,12 @@ use std::collections::HashMap;
 use std::fs;
 
 use agentmap::analyze::{
-    detect_modules, extract_imports, extract_memory_markers, extract_symbols, FileGraph,
+    detect_modules, extract_imports, extract_memory_markers, extract_symbols, FileGraph, ModuleInfo,
 };
 use agentmap::cli::Args;
 use agentmap::emit::{
     write_hierarchical, write_outputs, CriticalFile, DiffInfo, HierarchicalOutput, HubFile,
-    JsonOutput, LargeFileEntry, OutputBundle, ProjectInfo,
+    JsonOutput, LargeFileEntry, ModuleOutput, OutputBundle, ProjectInfo,
 };
 use agentmap::generate::{
     detect_entry_points, file_path_to_slug, generate_agents_md, generate_file_doc,
@@ -150,11 +150,13 @@ fn run_analysis(args: &Args, work_path: &std::path::Path) -> Result<()> {
         .or_else(|| get_default_branch(work_path))
         .unwrap_or_else(|| "main".to_string());
 
+    let modules = detect_modules(&files);
+
     if args.json {
         return run_json_output(
-            args,
             work_path,
             &files,
+            &modules,
             &large_file_symbols,
             &all_memory,
             &entry_points,
@@ -202,9 +204,9 @@ fn run_analysis(args: &Args, work_path: &std::path::Path) -> Result<()> {
 }
 
 fn run_json_output(
-    _args: &Args,
     work_path: &std::path::Path,
     files: &[FileEntry],
+    modules: &[ModuleInfo],
     large_file_symbols: &[(FileEntry, Vec<Symbol>)],
     all_memory: &[MemoryEntry],
     entry_points: &[String],
@@ -213,6 +215,11 @@ fn run_json_output(
     diff_stats: Option<&Vec<DiffStat>>,
     diff_base_ref: &str,
 ) -> Result<()> {
+    let module_outputs: Vec<ModuleOutput> = modules
+        .iter()
+        .map(|m| ModuleOutput::from_module_info(m, all_memory, large_file_symbols, hub_files))
+        .collect();
+
     let json_output = JsonOutput {
         version: env!("CARGO_PKG_VERSION").to_string(),
         generated_at: Utc::now(),
@@ -221,7 +228,9 @@ fn run_json_output(
             files_scanned: files.len(),
             large_files_count: large_file_symbols.len(),
             memory_markers_count: all_memory.len(),
+            modules_count: modules.len(),
         },
+        modules: module_outputs,
         files: files.to_vec(),
         large_files: large_file_symbols
             .iter()
