@@ -8,8 +8,8 @@ use agentmap::analyze::{
     detect_modules, extract_imports, extract_memory_markers, extract_symbols, FileGraph, ModuleInfo,
 };
 use agentmap::cli::{
-    install_hooks, remove_hooks, run_check, run_mcp_http_server, run_mcp_server, run_templates,
-    run_update, run_watch, Args, Command, HooksAction,
+    install_hooks_with_manager, remove_hooks, run_check, run_mcp_http_server, run_mcp_server,
+    run_templates, run_update, run_watch, Args, Command, HooksAction,
 };
 use agentmap::emit::{
     calculate_module_state, current_timestamp, write_hierarchical, CriticalFile, DiffInfo,
@@ -39,7 +39,12 @@ fn main() -> Result<()> {
         Some(Command::Hooks { action }) => {
             let path = args.path.canonicalize().unwrap_or(args.path.clone());
             return match action {
-                HooksAction::Install => install_hooks(&path),
+                HooksAction::Install {
+                    native,
+                    husky,
+                    lefthook,
+                    pre_commit,
+                } => install_hooks_with_manager(&path, native, husky, lefthook, pre_commit),
                 HooksAction::Remove => remove_hooks(&path),
             };
         }
@@ -507,7 +512,7 @@ fn run_init(
     }
 
     if hooks {
-        install_hooks(path)?;
+        install_hooks_with_manager(path, false, false, false, false)?;
         did_something = true;
     }
 

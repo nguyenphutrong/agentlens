@@ -172,8 +172,14 @@ Watch mode leverages the incremental manifest system, so only changed modules ar
 Automate documentation regeneration at key git events:
 
 ```bash
-# Install hooks (pre-commit, post-checkout, post-merge)
+# Install hooks (auto-detects Husky, Lefthook, pre-commit, or native git)
 agentmap hooks install
+
+# Force specific hook manager
+agentmap hooks install --native      # Native git hooks
+agentmap hooks install --husky       # Husky (.husky/)
+agentmap hooks install --lefthook    # Lefthook (lefthook.yml)
+agentmap hooks install --pre-commit  # pre-commit (.pre-commit-config.yaml)
 
 # Remove hooks
 agentmap hooks remove
@@ -181,6 +187,15 @@ agentmap hooks remove
 # Skip hooks temporarily
 AGENTMAP_SKIP=1 git commit -m "quick fix"
 ```
+
+### Supported Hook Managers
+
+| Manager | Detection | Hooks Supported |
+|---------|-----------|-----------------|
+| **Native git** | Fallback | pre-commit, post-checkout, post-merge |
+| **Husky** | `.husky/` directory | pre-commit, post-checkout, post-merge |
+| **Lefthook** | `lefthook.yml` | pre-commit, post-checkout, post-merge |
+| **pre-commit** | `.pre-commit-config.yaml` | pre-commit only |
 
 Installed hooks:
 - **pre-commit**: Regenerates docs and stages `.agentmap/`
@@ -301,6 +316,10 @@ Templates are **non-destructive**: they append to existing files and skip if age
 agentmap can run as an MCP server for AI tools like Claude Desktop and Cursor:
 
 ```bash
+# Using npx (no install required)
+npx agentmap-cli serve --mcp
+
+# Or if installed globally
 agentmap serve --mcp
 ```
 
@@ -312,6 +331,19 @@ agentmap serve --mcp
 | `get_module` | Get module docs by slug |
 | `check_stale` | Check if docs need update |
 | `get_outline` | Get symbol outline for a file |
+
+**Example MCP config (Claude Desktop, Cursor, etc.):**
+
+```json
+{
+  "mcpServers": {
+    "agentmap": {
+      "command": "npx",
+      "args": ["agentmap-cli", "serve", "--mcp"]
+    }
+  }
+}
+```
 
 See [MCP Server Documentation](docs/mcp-server.md) for setup instructions and integration guides.
 

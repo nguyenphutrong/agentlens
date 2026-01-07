@@ -1,6 +1,6 @@
 {
   "name": "agentmap-cli",
-  "version": "0.4.0",
+  "version": "0.4.1",
   "description": "Prepare codebases for AI agents by generating hierarchical documentation",
   "keywords": [
     "ai",
@@ -24,7 +24,7 @@
     "url": "https://github.com/nguyenphutrong/agentmap/issues"
   },
   "bin": {
-    "agentmap": "./bin/agentmap"
+    "agentmap": "bin/agentmap"
   },
   "main": "./lib/index.js",
   "files": [

@@ -218,6 +218,10 @@ CLI flags ghi đè giá trị config file.
 agentmap có thể chạy như MCP server cho các AI tools như Claude Desktop và Cursor:
 
 ```bash
+# Sử dụng npx (không cần cài đặt)
+npx agentmap-cli serve --mcp
+
+# Hoặc nếu đã cài global
 agentmap serve --mcp
 ```
 
@@ -229,6 +233,19 @@ agentmap serve --mcp
 | `get_module` | Lấy docs module theo slug |
 | `check_stale` | Kiểm tra docs có cần cập nhật |
 | `get_outline` | Lấy symbol outline cho file |
+
+**Ví dụ MCP config (Claude Desktop, Cursor, etc.):**
+
+```json
+{
+  "mcpServers": {
+    "agentmap": {
+      "command": "npx",
+      "args": ["agentmap-cli", "serve", "--mcp"]
+    }
+  }
+}
+```
 
 Xem [MCP Server Documentation](docs/mcp-server.vi.md) để biết hướng dẫn cài đặt và tích hợp.
 

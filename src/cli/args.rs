@@ -42,7 +42,20 @@ pub enum Command {
 #[derive(Subcommand, Debug, Clone)]
 pub enum HooksAction {
     /// Install git hooks (pre-commit, post-checkout, post-merge)
-    Install,
+    Install {
+        /// Force native git hooks (skip auto-detection)
+        #[arg(long)]
+        native: bool,
+        /// Force Husky integration
+        #[arg(long)]
+        husky: bool,
+        /// Force Lefthook integration
+        #[arg(long)]
+        lefthook: bool,
+        /// Force pre-commit (Python) integration
+        #[arg(long, name = "pre-commit")]
+        pre_commit: bool,
+    },
     /// Remove git hooks
     Remove,
 }
