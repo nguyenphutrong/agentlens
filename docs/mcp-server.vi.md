@@ -6,10 +6,10 @@ agentlens có thể chạy như một [MCP (Model Context Protocol)](https://mod
 
 ```bash
 # Sử dụng npx (không cần cài đặt)
-npx agentlens-cli serve --mcp
+npx @agentlens/cli serve --mcp
 
 # Sử dụng bunx
-bunx agentlens-cli serve --mcp
+bunx @agentlens/cli serve --mcp
 
 # Hoặc nếu đã cài global
 agentlens serve --mcp
@@ -107,7 +107,7 @@ Thêm vào `claude_desktop_config.json`:
   "mcpServers": {
     "agentlens": {
       "command": "npx",
-      "args": ["agentlens-cli", "serve", "--mcp"],
+      "args": ["@agentlens/cli", "serve", "--mcp"],
       "cwd": "/path/to/your/project"
     }
   }
@@ -125,10 +125,10 @@ Dùng CLI để thêm MCP server:
 
 ```bash
 # Thêm với user scope (có sẵn trong mọi project)
-claude mcp add agentlens --scope user -- npx agentlens-cli serve --mcp
+claude mcp add agentlens --scope user -- npx @agentlens/cli serve --mcp
 
 # Hoặc thêm với project scope (chỉ project này)
-claude mcp add agentlens --scope project -- npx agentlens-cli serve --mcp
+claude mcp add agentlens --scope project -- npx @agentlens/cli serve --mcp
 ```
 
 **Hoặc sửa config trực tiếp** tại `~/.claude/settings.json`:
@@ -138,7 +138,7 @@ claude mcp add agentlens --scope project -- npx agentlens-cli serve --mcp
   "mcpServers": {
     "agentlens": {
       "command": "npx",
-      "args": ["agentlens-cli", "serve", "--mcp"]
+      "args": ["@agentlens/cli", "serve", "--mcp"]
     }
   }
 }
@@ -160,7 +160,7 @@ Thêm vào `opencode.json` (project root) hoặc `~/.config/opencode/config.json
   "mcp": {
     "agentlens": {
       "type": "local",
-      "command": ["npx", "agentlens-cli", "serve", "--mcp"],
+      "command": ["npx", "@agentlens/cli", "serve", "--mcp"],
       "enabled": true
     }
   }
@@ -178,7 +178,7 @@ Thêm vào `.cursor/mcp.json` trong project:
   "mcpServers": {
     "agentlens": {
       "command": "npx",
-      "args": ["agentlens-cli", "serve", "--mcp"]
+      "args": ["@agentlens/cli", "serve", "--mcp"]
     }
   }
 }
@@ -193,7 +193,7 @@ Thêm vào `~/.codeium/windsurf/mcp_config.json`:
   "mcpServers": {
     "agentlens": {
       "command": "npx",
-      "args": ["agentlens-cli", "serve", "--mcp"],
+      "args": ["@agentlens/cli", "serve", "--mcp"],
       "cwd": "/path/to/your/project"
     }
   }
@@ -210,7 +210,7 @@ Thêm vào Zed settings (`~/.config/zed/settings.json`):
     "agentlens": {
       "command": {
         "path": "npx",
-        "args": ["agentlens-cli", "serve", "--mcp"]
+        "args": ["@agentlens/cli", "serve", "--mcp"]
       }
     }
   }
@@ -226,7 +226,7 @@ Nếu dùng MCP extension, thêm vào `.vscode/mcp.json`:
   "servers": {
     "agentlens": {
       "command": "npx",
-      "args": ["agentlens-cli", "serve", "--mcp"]
+      "args": ["@agentlens/cli", "serve", "--mcp"]
     }
   }
 }
@@ -237,7 +237,7 @@ Nếu dùng MCP extension, thêm vào `.vscode/mcp.json`:
 Bất kỳ MCP-compatible client nào đều có thể kết nối qua stdio transport:
 
 ```bash
-npx agentlens-cli serve --mcp
+npx @agentlens/cli serve --mcp
 ```
 
 Server giao tiếp qua JSON-RPC qua stdin/stdout.

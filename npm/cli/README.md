@@ -1,4 +1,4 @@
-# agentlens-cli
+# @agentlens/cli
 
 CLI tool to prepare codebases for AI agents by generating hierarchical documentation.
 
@@ -6,20 +6,20 @@ CLI tool to prepare codebases for AI agents by generating hierarchical documenta
 
 ```bash
 # Using npx (no install required)
-npx agentlens-cli
+npx @agentlens/cli
 
 # Or install globally
-npm install -g agentlens-cli
+npm install -g @agentlens/cli
 ```
 
 ## Usage
 
 ```bash
 # Generate docs for current directory
-npx agentlens-cli
+npx @agentlens/cli
 
 # Start MCP server for AI tools
-npx agentlens-cli serve --mcp
+npx @agentlens/cli serve --mcp
 ```
 
 ## MCP Server
@@ -31,7 +31,7 @@ Use agentlens as an MCP server with Claude Desktop, Cursor, OpenCode, and other 
   "mcpServers": {
     "agentlens": {
       "command": "npx",
-      "args": ["agentlens-cli", "serve", "--mcp"]
+      "args": ["@agentlens/cli", "serve", "--mcp"]
     }
   }
 }

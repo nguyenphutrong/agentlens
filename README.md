@@ -55,11 +55,11 @@ brew install nguyenphutrong/tap/agentlens
 ### npm / pnpm / yarn / bun
 
 ```bash
-npx agentlens-cli            # Run without install
-npm install -g agentlens-cli
-pnpm add -g agentlens-cli
-yarn global add agentlens-cli
-bun add -g agentlens-cli
+npx @agentlens/cli            # Run without install
+npm install -g @agentlens/cli
+pnpm add -g @agentlens/cli
+yarn global add @agentlens/cli
+bun add -g @agentlens/cli
 ```
 
 ### Quick Install Script
@@ -333,7 +333,7 @@ agentlens can run as an MCP server for AI tools like Claude Desktop and Cursor:
 
 ```bash
 # Using npx (no install required)
-npx agentlens-cli serve --mcp
+npx @agentlens/cli serve --mcp
 
 # Or if installed globally
 agentlens serve --mcp
@@ -355,7 +355,7 @@ agentlens serve --mcp
   "mcpServers": {
     "agentlens": {
       "command": "npx",
-      "args": ["agentlens-cli", "serve", "--mcp"]
+      "args": ["@agentlens/cli", "serve", "--mcp"]
     }
   }
 }

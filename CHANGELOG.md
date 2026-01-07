@@ -15,7 +15,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   - pre-commit (`.pre-commit-config.yaml`)
   - Native git hooks (`.git/hooks/`)
 - **CLI flags for hook managers** - `--native`, `--husky`, `--lefthook`, `--pre-commit`
-- **npm package** (`agentlens-cli`) - Install via `npm install -g agentlens-cli` or use `npx agentlens-cli`
+- **npm package** (`@agentlens/cli`) - Install via `npm install -g @agentlens/cli` or use `npx @agentlens/cli`
 - **MCP server documentation** - Comprehensive docs (EN/VI) for Model Context Protocol integration
 
 ### Changed

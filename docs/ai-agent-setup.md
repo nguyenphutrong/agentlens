@@ -6,13 +6,13 @@ Instructions for AI coding assistants to install and use agentlens.
 
 ```bash
 # Option 1: npx (no install required)
-npx agentlens-cli
+npx @agentlens/cli
 
 # Option 2: Homebrew (macOS/Linux)
 brew install nguyenphutrong/tap/agentlens
 
 # Option 3: npm global
-npm install -g agentlens-cli
+npm install -g @agentlens/cli
 
 # Option 4: Cargo
 cargo install agentlens
@@ -52,7 +52,7 @@ After generation, navigate the documentation hierarchy:
 Run agentlens as an MCP server for real-time codebase queries:
 
 ```bash
-npx agentlens-cli serve --mcp
+npx @agentlens/cli serve --mcp
 ```
 
 ### MCP Config
@@ -64,7 +64,7 @@ Add to your AI tool's MCP configuration:
   "mcpServers": {
     "agentlens": {
       "command": "npx",
-      "args": ["agentlens-cli", "serve", "--mcp"]
+      "args": ["@agentlens/cli", "serve", "--mcp"]
     }
   }
 }
@@ -138,10 +138,10 @@ agentlens          # Regenerate
 
 ```bash
 # Verify installation
-which agentlens || npx agentlens-cli --version
+which agentlens || npx @agentlens/cli --version
 
 # Reinstall if needed
-npm install -g agentlens-cli
+npm install -g @agentlens/cli
 ```
 
 ### Docs seem stale

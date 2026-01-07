@@ -219,7 +219,7 @@ agentlens có thể chạy như MCP server cho các AI tools như Claude Desktop
 
 ```bash
 # Sử dụng npx (không cần cài đặt)
-npx agentlens-cli serve --mcp
+npx @agentlens/cli serve --mcp
 
 # Hoặc nếu đã cài global
 agentlens serve --mcp
@@ -241,7 +241,7 @@ agentlens serve --mcp
   "mcpServers": {
     "agentlens": {
       "command": "npx",
-      "args": ["agentlens-cli", "serve", "--mcp"]
+      "args": ["@agentlens/cli", "serve", "--mcp"]
     }
   }
 }

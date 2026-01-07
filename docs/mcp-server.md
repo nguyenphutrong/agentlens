@@ -6,10 +6,10 @@ agentlens can run as an [MCP (Model Context Protocol)](https://modelcontextproto
 
 ```bash
 # Using npx (no install required)
-npx agentlens-cli serve --mcp
+npx @agentlens/cli serve --mcp
 
 # Using bunx
-bunx agentlens-cli serve --mcp
+bunx @agentlens/cli serve --mcp
 
 # Or if installed globally
 agentlens serve --mcp
@@ -107,7 +107,7 @@ Add to `claude_desktop_config.json`:
   "mcpServers": {
     "agentlens": {
       "command": "npx",
-      "args": ["agentlens-cli", "serve", "--mcp"],
+      "args": ["@agentlens/cli", "serve", "--mcp"],
       "cwd": "/path/to/your/project"
     }
   }
@@ -125,10 +125,10 @@ Use the CLI to add the MCP server:
 
 ```bash
 # Add with user scope (available in all projects)
-claude mcp add agentlens --scope user -- npx agentlens-cli serve --mcp
+claude mcp add agentlens --scope user -- npx @agentlens/cli serve --mcp
 
 # Or add with project scope (only this project)
-claude mcp add agentlens --scope project -- npx agentlens-cli serve --mcp
+claude mcp add agentlens --scope project -- npx @agentlens/cli serve --mcp
 ```
 
 **Or edit config directly** at `~/.claude/settings.json`:
@@ -138,7 +138,7 @@ claude mcp add agentlens --scope project -- npx agentlens-cli serve --mcp
   "mcpServers": {
     "agentlens": {
       "command": "npx",
-      "args": ["agentlens-cli", "serve", "--mcp"]
+      "args": ["@agentlens/cli", "serve", "--mcp"]
     }
   }
 }
@@ -160,7 +160,7 @@ Add to `opencode.json` (project root) or `~/.config/opencode/config.json` (globa
   "mcp": {
     "agentlens": {
       "type": "local",
-      "command": ["npx", "agentlens-cli", "serve", "--mcp"],
+      "command": ["npx", "@agentlens/cli", "serve", "--mcp"],
       "enabled": true
     }
   }
@@ -178,7 +178,7 @@ Add to `.cursor/mcp.json` in your project:
   "mcpServers": {
     "agentlens": {
       "command": "npx",
-      "args": ["agentlens-cli", "serve", "--mcp"]
+      "args": ["@agentlens/cli", "serve", "--mcp"]
     }
   }
 }
@@ -193,7 +193,7 @@ Add to `~/.codeium/windsurf/mcp_config.json`:
   "mcpServers": {
     "agentlens": {
       "command": "npx",
-      "args": ["agentlens-cli", "serve", "--mcp"],
+      "args": ["@agentlens/cli", "serve", "--mcp"],
       "cwd": "/path/to/your/project"
     }
   }
@@ -210,7 +210,7 @@ Add to Zed settings (`~/.config/zed/settings.json`):
     "agentlens": {
       "command": {
         "path": "npx",
-        "args": ["agentlens-cli", "serve", "--mcp"]
+        "args": ["@agentlens/cli", "serve", "--mcp"]
       }
     }
   }
@@ -226,7 +226,7 @@ If using an MCP extension, add to `.vscode/mcp.json`:
   "servers": {
     "agentlens": {
       "command": "npx",
-      "args": ["agentlens-cli", "serve", "--mcp"]
+      "args": ["@agentlens/cli", "serve", "--mcp"]
     }
   }
 }
@@ -237,7 +237,7 @@ If using an MCP extension, add to `.vscode/mcp.json`:
 Any MCP-compatible client can connect via stdio transport:
 
 ```bash
-npx agentlens-cli serve --mcp
+npx @agentlens/cli serve --mcp
 ```
 
 The server communicates via JSON-RPC over stdin/stdout.
