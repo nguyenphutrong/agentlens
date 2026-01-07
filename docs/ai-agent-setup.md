@@ -1,63 +1,49 @@
 # AI Agent Setup Guide
 
-Instructions for AI coding assistants to install and use agentlens.
+## Step 1: Install
 
-## Quick Install (Choose One)
+Run ONE of these commands:
 
 ```bash
-# Option 1: npx (no install required)
-npx @agentlens/cli
-
-# Option 2: Homebrew (macOS/Linux)
-brew install nguyenphutrong/tap/agentlens
-
-# Option 3: npm global
-npm install -g @agentlens/cli
-
-# Option 4: Cargo
-cargo install agentlens
-
-# Option 5: Direct download
-curl -fsSL https://raw.githubusercontent.com/nguyenphutrong/agentlens/main/scripts/install.sh | sh
+npx @agentlens/cli --version          # Preferred (no install)
+brew install nguyenphutrong/tap/agentlens  # macOS
+npm install -g @agentlens/cli         # npm global
+cargo install agentlens               # Rust
 ```
 
-## Generate Documentation
+Verify: `agentlens --version` should output version number.
+
+## Step 2: Generate Docs
 
 ```bash
-# Generate docs for current project
+cd <project-root>
 agentlens
-
-# Output: .agentlens/ directory with hierarchical docs
 ```
 
-## Reading Protocol
+Output: `.agentlens/` directory created.
 
-After generation, navigate the documentation hierarchy:
+## Step 3: Read the Docs
 
-```
-1. Start with .agentlens/INDEX.md
-   → Project overview, module list, entry points
+Navigate in this order:
 
-2. Go to relevant module: .agentlens/modules/{name}/MODULE.md
-   → File list, module structure, child modules
+1. `.agentlens/INDEX.md` → Project overview, module list
+2. `.agentlens/modules/{name}/MODULE.md` → Module details
+3. `.agentlens/modules/{name}/outline.md` → Symbol maps (large files)
+4. `.agentlens/modules/{name}/memory.md` → Warnings, TODOs
 
-3. Check module docs as needed:
-   → outline.md  - Symbol maps for large files
-   → memory.md   - Warnings, TODOs, technical debt
-   → imports.md  - Dependencies between files
-```
+## Step 4: Keep Fresh (Optional)
 
-## MCP Server (Recommended)
-
-Run agentlens as an MCP server for real-time codebase queries:
+Choose one:
 
 ```bash
-npx @agentlens/cli serve --mcp
+agentlens hooks install  # Auto-regenerate on git events
+agentlens watch          # Auto-regenerate on file save
+agentlens --check        # Check if stale (CI)
 ```
 
-### MCP Config
+## MCP Server (Optional)
 
-Add to your AI tool's MCP configuration:
+For real-time queries, add to MCP config:
 
 ```json
 {
@@ -70,89 +56,22 @@ Add to your AI tool's MCP configuration:
 }
 ```
 
-### Available MCP Tools
+Tools: `regenerate`, `get_module`, `check_stale`, `get_outline`
 
-| Tool | Description |
-|------|-------------|
-| `regenerate` | Regenerate documentation |
-| `get_module` | Get module docs by slug |
-| `check_stale` | Check if docs need update |
-| `get_outline` | Get symbol outline for a file |
+## Add to Project AI Instructions
 
-## Project Integration
-
-### Add to AI Instructions
-
-Include in your project's `.cursorrules`, `CLAUDE.md`, or `AGENTS.md`:
-
-```markdown
-## Codebase Navigation
-
-Before working on this codebase:
-1. Read .agentlens/INDEX.md for project overview
-2. Navigate to relevant module's MODULE.md
-3. Check memory.md for warnings before editing
-4. Use outline.md for large file navigation
-```
-
-### Generate Templates
+Run once to generate templates:
 
 ```bash
-# Generate AI tool configuration templates
 agentlens init --templates
-
-# Generates:
-# - .cursorrules (Cursor IDE)
-# - CLAUDE.md (Claude Code)
-# - AGENTS.md (OpenCode)
 ```
 
-## Keep Docs Fresh
-
-### Option A: Git Hooks (Automatic)
-
-```bash
-agentlens hooks install
-```
-
-Docs regenerate on commit, checkout, and merge.
-
-### Option B: Watch Mode (Development)
-
-```bash
-agentlens watch
-```
-
-Docs regenerate on file save.
-
-### Option C: Manual
-
-```bash
-agentlens --check  # Check if stale
-agentlens          # Regenerate
-```
+Creates: `.cursorrules`, `CLAUDE.md`, `AGENTS.md`
 
 ## Troubleshooting
 
-### Command not found
-
-```bash
-# Verify installation
-which agentlens || npx @agentlens/cli --version
-
-# Reinstall if needed
-npm install -g @agentlens/cli
-```
-
-### Docs seem stale
-
-```bash
-agentlens --force  # Force full regeneration
-```
-
-### Large repository slow
-
-```bash
-agentlens --depth 3  # Limit directory depth
-agentlens -i "test/,fixtures/"  # Ignore patterns
-```
+| Problem | Solution |
+|---------|----------|
+| Command not found | `npm install -g @agentlens/cli` |
+| Docs stale | `agentlens --force` |
+| Slow on large repo | `agentlens --depth 3 -i "test/,node_modules/"` |

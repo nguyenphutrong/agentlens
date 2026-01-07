@@ -46,13 +46,15 @@ AI coding assistants struggle with large codebases because they can't see the fu
 
 ## Installation
 
-### Homebrew (macOS) — Recommended
+### For Humans
+
+#### Homebrew (macOS) — Recommended
 
 ```bash
 brew install nguyenphutrong/tap/agentlens
 ```
 
-### npm / pnpm / yarn / bun
+#### npm / pnpm / yarn / bun
 
 ```bash
 npx @agentlens/cli            # Run without install
@@ -62,19 +64,19 @@ yarn global add @agentlens/cli
 bun add -g @agentlens/cli
 ```
 
-### Quick Install Script
+#### Quick Install Script
 
 ```bash
 curl -fsSL https://raw.githubusercontent.com/nguyenphutrong/agentlens/main/scripts/install.sh | sh
 ```
 
-### From crates.io
+#### From crates.io
 
 ```bash
 cargo install agentlens
 ```
 
-### From Source
+#### From Source
 
 ```bash
 git clone https://github.com/nguyenphutrong/agentlens
@@ -82,9 +84,18 @@ cd agentlens
 cargo install --path .
 ```
 
-### Manual Download
+#### Manual Download
 
 Download prebuilt binaries from [GitHub Releases](https://github.com/nguyenphutrong/agentlens/releases).
+
+### Alternative: Let an LLM Agent Do It
+
+Copy this prompt to your AI coding assistant:
+
+```
+Install and configure agentlens by following the instructions at:
+https://github.com/nguyenphutrong/agentlens/blob/main/docs/ai-agent-setup.md
+```
 
 ## Usage
 
