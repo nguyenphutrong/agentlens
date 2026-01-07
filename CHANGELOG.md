@@ -5,6 +5,41 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.4.2] - 2026-01-07
+
+### Added
+
+- **Multiple git hook managers** - Auto-detect and integrate with:
+  - Husky (`.husky/` directory)
+  - Lefthook (`lefthook.yml`)
+  - pre-commit (`.pre-commit-config.yaml`)
+  - Native git hooks (`.git/hooks/`)
+- **CLI flags for hook managers** - `--native`, `--husky`, `--lefthook`, `--pre-commit`
+- **npm package** (`agentmap-cli`) - Install via `npm install -g agentmap-cli` or use `npx agentmap-cli`
+- **MCP server documentation** - Comprehensive docs (EN/VI) for Model Context Protocol integration
+
+### Changed
+
+- npm package now has dedicated README with usage examples
+
+## [0.4.0] - 2026-01-07
+
+### Added
+
+- **MCP server** - Model Context Protocol support with stdio transport for AI tool integration
+- **AI tool templates** - Pre-built configurations for Cursor, Claude Code, OpenCode
+- **AGENT.md generation** - Auto-generated AI instruction file at project root
+- **Watch mode** (`--watch`) - Real-time file watching with automatic regeneration
+- **Git hooks** (`--hooks`) - Automatic regeneration on git commit
+- **Config file** (`agentmap.toml`) - Project-level configuration support
+- **CI validation** (`--check`) - Exit non-zero if `.agentmap/` is outdated
+- **Self-update** (`--update`) - Update agentmap binary from command line
+- **Homebrew tap** - Install via `brew install trongnguyen24/tap/agentmap`
+
+### Fixed
+
+- Clippy warnings in args and runner modules
+
 ## [0.3.0] - 2026-01-06
 
 ### Added
