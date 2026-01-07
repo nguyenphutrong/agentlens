@@ -49,7 +49,7 @@ AI coding assistants struggle with large codebases because they can't see the fu
 ### Homebrew (macOS) — Recommended
 
 ```bash
-brew install trongnguyen24/tap/agentmap
+brew install nguyenphutrong/tap/agentmap
 ```
 
 ### npm / pnpm / yarn / bun
