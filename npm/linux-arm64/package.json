@@ -1,0 +1,14 @@
+{
+  "name": "@agentmap/linux-arm64",
+  "version": "0.4.2",
+  "description": "agentmap binary for Linux ARM64",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/nguyenphutrong/agentmap.git"
+  },
+  "license": "MIT",
+  "os": ["linux"],
+  "cpu": ["arm64"],
+  "files": ["bin"],
+  "preferUnplugged": true
+}

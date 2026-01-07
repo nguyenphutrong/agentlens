@@ -29,25 +29,16 @@
   "main": "./lib/index.js",
   "files": [
     "bin",
-    "lib",
-    "scripts"
+    "lib"
   ],
-  "scripts": {
-    "postinstall": "node scripts/postinstall.js"
-  },
-  "dependencies": {
-    "tar": "^7.0.0"
-  },
   "engines": {
     "node": ">=16.0.0"
   },
-  "os": [
-    "darwin",
-    "linux",
-    "win32"
-  ],
-  "cpu": [
-    "x64",
-    "arm64"
-  ]
+  "optionalDependencies": {
+    "@agentmap/darwin-arm64": "0.4.2",
+    "@agentmap/darwin-x64": "0.4.2",
+    "@agentmap/linux-arm64": "0.4.2",
+    "@agentmap/linux-x64": "0.4.2",
+    "@agentmap/win32-x64": "0.4.2"
+  }
 }

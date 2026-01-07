@@ -1,2 +1,7 @@
 /target
 opencode.jsonc
+
+# npm platform binaries (CI downloads these)
+npm/*/bin/agentmap
+npm/*/bin/agentmap.exe
+npm/*/bin/.version

@@ -1,177 +1,56 @@
 const { spawn } = require("child_process");
 const fs = require("fs");
 const path = require("path");
-const https = require("https");
-const { createGunzip } = require("zlib");
-const tar = require("tar");
 
-const REPO = "nguyenphutrong/agentmap";
 const BINARY_NAME = process.platform === "win32" ? "agentmap.exe" : "agentmap";
 
-const PLATFORM_MAP = {
-  darwin: "darwin",
-  linux: "linux",
-  win32: "windows",
+const PLATFORM_PACKAGES = {
+  "darwin-arm64": "@agentmap/darwin-arm64",
+  "darwin-x64": "@agentmap/darwin-x64",
+  "linux-arm64": "@agentmap/linux-arm64",
+  "linux-x64": "@agentmap/linux-x64",
+  "win32-x64": "@agentmap/win32-x64",
 };
 
-const ARCH_MAP = {
-  x64: "x86_64",
-  arm64: "aarch64",
-};
-
-function getBinDir() {
-  return path.join(__dirname, "..", "bin");
+function getPlatformPackage() {
+  const platform = process.platform;
+  const arch = process.arch === "arm64" ? "arm64" : "x64";
+  const key = `${platform}-${arch}`;
+  return PLATFORM_PACKAGES[key];
 }
 
 function getBinaryPath() {
-  return path.join(getBinDir(), BINARY_NAME);
-}
+  const platformPackage = getPlatformPackage();
 
-function getPlatformInfo() {
-  const platform = PLATFORM_MAP[process.platform];
-  const arch = ARCH_MAP[process.arch];
-
-  if (!platform) {
-    throw new Error(`Unsupported platform: ${process.platform}`);
-  }
-  if (!arch) {
-    throw new Error(`Unsupported architecture: ${process.arch}`);
+  if (!platformPackage) {
+    throw new Error(
+      `Unsupported platform: ${process.platform}-${process.arch}`
+    );
   }
 
-  return { platform, arch };
-}
+  try {
+    const packagePath = require.resolve(`${platformPackage}/package.json`);
+    const binPath = path.join(path.dirname(packagePath), "bin", BINARY_NAME);
 
-function getDownloadUrl(version) {
-  const { platform, arch } = getPlatformInfo();
-  const filename = `agentmap-${platform}-${arch}.tar.gz`;
-  return `https://github.com/${REPO}/releases/download/${version}/${filename}`;
-}
+    if (fs.existsSync(binPath)) {
+      return binPath;
+    }
+  } catch (e) {}
 
-async function getLatestVersion() {
-  return new Promise((resolve, reject) => {
-    const options = {
-      hostname: "api.github.com",
-      path: `/repos/${REPO}/releases/latest`,
-      headers: {
-        "User-Agent": "agentmap-npm",
-      },
-    };
-
-    https
-      .get(options, (res) => {
-        let data = "";
-        res.on("data", (chunk) => {
-          data += chunk;
-        });
-        res.on("end", () => {
-          try {
-            const json = JSON.parse(data);
-            resolve(json.tag_name);
-          } catch (e) {
-            reject(new Error("Failed to parse GitHub API response"));
-          }
-        });
-      })
-      .on("error", reject);
-  });
-}
-
-function downloadFile(url) {
-  return new Promise((resolve, reject) => {
-    const request = (targetUrl) => {
-      https
-        .get(targetUrl, (res) => {
-          if (res.statusCode === 301 || res.statusCode === 302) {
-            request(res.headers.location);
-            return;
-          }
-
-          if (res.statusCode !== 200) {
-            reject(new Error(`Download failed with status ${res.statusCode}`));
-            return;
-          }
-
-          resolve(res);
-        })
-        .on("error", reject);
-    };
-
-    request(url);
-  });
-}
-
-async function downloadBinary(version) {
-  const url = getDownloadUrl(version);
-  const binDir = getBinDir();
-
-  if (!fs.existsSync(binDir)) {
-    fs.mkdirSync(binDir, { recursive: true });
+  const localBinPath = path.join(__dirname, "..", "bin", BINARY_NAME);
+  if (fs.existsSync(localBinPath)) {
+    return localBinPath;
   }
 
-  console.log(`Downloading agentmap ${version}...`);
-
-  const response = await downloadFile(url);
-
-  await new Promise((resolve, reject) => {
-    const gunzip = createGunzip();
-    const extract = tar.extract({
-      cwd: binDir,
-      filter: (filePath) =>
-        filePath === BINARY_NAME || filePath === "agentmap",
-    });
-
-    response
-      .pipe(gunzip)
-      .pipe(extract)
-      .on("finish", resolve)
-      .on("error", reject);
-  });
-
-  if (process.platform !== "win32") {
-    fs.chmodSync(getBinaryPath(), 0o755);
-  }
-
-  fs.writeFileSync(path.join(binDir, ".version"), version);
-
-  console.log(`agentmap ${version} installed successfully!`);
-}
-
-function needsDownload(version) {
-  const binaryPath = getBinaryPath();
-  const versionFile = path.join(getBinDir(), ".version");
-
-  if (!fs.existsSync(binaryPath)) {
-    return true;
-  }
-
-  if (!fs.existsSync(versionFile)) {
-    return true;
-  }
-
-  const installedVersion = fs.readFileSync(versionFile, "utf-8").trim();
-  return installedVersion !== version;
-}
-
-async function ensureBinary() {
-  const version = await getLatestVersion();
-
-  if (needsDownload(version)) {
-    await downloadBinary(version);
-  }
-
-  return getBinaryPath();
+  throw new Error(
+    `agentmap binary not found. Please reinstall agentmap-cli or install manually:\n` +
+      `  cargo install agentmap\n` +
+      `  brew install nguyenphutrong/tap/agentmap`
+  );
 }
 
 function runBinary(args) {
   const binaryPath = getBinaryPath();
-
-  if (!fs.existsSync(binaryPath)) {
-    console.error(
-      "Binary not found. Running postinstall to download binary..."
-    );
-    require("../scripts/postinstall.js");
-    return;
-  }
 
   const child = spawn(binaryPath, args, {
     stdio: "inherit",
@@ -190,8 +69,5 @@ function runBinary(args) {
 
 module.exports = {
   getBinaryPath,
-  ensureBinary,
   runBinary,
-  getLatestVersion,
-  downloadBinary,
 };

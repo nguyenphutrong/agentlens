@@ -1,0 +1,14 @@
+{
+  "name": "@agentmap/win32-x64",
+  "version": "0.4.2",
+  "description": "agentmap binary for Windows x64",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/nguyenphutrong/agentmap.git"
+  },
+  "license": "MIT",
+  "os": ["win32"],
+  "cpu": ["x64"],
+  "files": ["bin"],
+  "preferUnplugged": true
+}

@@ -1,0 +1,14 @@
+{
+  "name": "@agentmap/darwin-x64",
+  "version": "0.4.2",
+  "description": "agentmap binary for macOS x64",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/nguyenphutrong/agentmap.git"
+  },
+  "license": "MIT",
+  "os": ["darwin"],
+  "cpu": ["x64"],
+  "files": ["bin"],
+  "preferUnplugged": true
+}

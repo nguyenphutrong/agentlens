@@ -139,6 +139,61 @@ jobs:
     name: Publish to npm
     needs: release
     runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        include:
+          - artifact: darwin-aarch64
+            npm-package: darwin-arm64
+          - artifact: darwin-x86_64
+            npm-package: darwin-x64
+          - artifact: linux-x86_64
+            npm-package: linux-x64
+          - artifact: linux-aarch64
+            npm-package: linux-arm64
+          - artifact: windows-x86_64
+            npm-package: win32-x64
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Download artifact
+        uses: actions/download-artifact@v4
+        with:
+          name: agentmap-${{ matrix.artifact }}
+          path: artifacts
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+          registry-url: "https://registry.npmjs.org"
+
+      - name: Prepare platform package
+        run: |
+          VERSION=${GITHUB_REF_NAME#v}
+          PKG_DIR=npm/${{ matrix.npm-package }}
+          
+          cd $PKG_DIR
+          npm version $VERSION --no-git-tag-version --allow-same-version
+          
+          if [[ "${{ matrix.npm-package }}" == "win32-x64" ]]; then
+            cd ../../artifacts
+            unzip agentmap-${{ matrix.artifact }}.zip -d ../npm/${{ matrix.npm-package }}/bin/
+          else
+            tar -xzf ../../artifacts/agentmap-${{ matrix.artifact }}.tar.gz -C bin/
+            chmod +x bin/agentmap
+          fi
+
+      - name: Publish platform package
+        run: |
+          cd npm/${{ matrix.npm-package }}
+          npm publish --access public
+        env:
+          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
+
+  publish-npm-cli:
+    name: Publish agentmap-cli to npm
+    needs: publish-npm
+    runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
 
@@ -153,11 +208,19 @@ jobs:
           VERSION=${GITHUB_REF_NAME#v}
           cd npm/cli
           npm version $VERSION --no-git-tag-version --allow-same-version
-
-      - name: Install dependencies
-        run: |
-          cd npm/cli
-          npm install
+          
+          node -e "
+            const pkg = require('./package.json');
+            const version = '$VERSION';
+            pkg.optionalDependencies = {
+              '@agentmap/darwin-arm64': version,
+              '@agentmap/darwin-x64': version,
+              '@agentmap/linux-arm64': version,
+              '@agentmap/linux-x64': version,
+              '@agentmap/win32-x64': version
+            };
+            require('fs').writeFileSync('package.json', JSON.stringify(pkg, null, 2) + '\n');
+          "
 
       - name: Publish to npm
         run: |
