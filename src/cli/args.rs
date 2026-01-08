@@ -45,6 +45,11 @@ pub enum Command {
         #[command(subcommand)]
         action: TelemetryAction,
     },
+    /// Manage agent skills for AI coding tools
+    Skills {
+        #[command(subcommand)]
+        action: SkillsAction,
+    },
 }
 
 #[derive(Subcommand, Debug, Clone)]
@@ -77,6 +82,29 @@ pub enum TelemetryAction {
         #[arg(value_name = "SLUG")]
         slug: String,
     },
+}
+
+#[derive(Subcommand, Debug, Clone)]
+pub enum SkillsAction {
+    /// Install agentlens skill for AI coding tools
+    Install {
+        /// Install for Claude Code (~/.claude/skills/)
+        #[arg(long)]
+        claude: bool,
+        /// Install for OpenCode (~/.config/opencode/skill/)
+        #[arg(long)]
+        opencode: bool,
+        /// Install for Codex CLI (~/.codex/skills/)
+        #[arg(long)]
+        codex: bool,
+        /// Install for all supported tools
+        #[arg(long)]
+        all: bool,
+    },
+    /// Remove agentlens skill from all locations
+    Remove,
+    /// List installed skills and their locations
+    List,
 }
 
 #[derive(Parser, Debug, Clone)]

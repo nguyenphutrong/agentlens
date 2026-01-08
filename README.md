@@ -212,6 +212,22 @@ npx @agentlens/cli serve --mcp
 
 Tools: `regenerate`, `get_module`, `check_stale`, `get_outline`
 
+### Agent Skills
+
+Install agentlens skill for AI coding tools (Claude Code, OpenCode, Codex CLI):
+
+```bash
+agentlens skills install           # Auto-detect and install
+agentlens skills install --claude  # Claude Code only
+agentlens skills install --opencode # OpenCode only
+agentlens skills install --codex   # Codex CLI only
+agentlens skills install --all     # All supported tools
+agentlens skills list              # Show installed skills
+agentlens skills remove            # Remove skills
+```
+
+The skill teaches AI agents how to navigate codebases using agentlens documentation.
+
 ---
 
 ## 🗂️ Output Structure
@@ -331,6 +347,7 @@ Commands:
   hooks       Manage git hooks
   init        Initialize configuration
   serve       Start MCP server
+  skills      Manage agent skills for AI tools
   telemetry   Analyze token usage and efficiency
   update      Update to latest version
 ```

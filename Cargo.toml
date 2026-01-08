@@ -51,6 +51,7 @@ uuid = { version = "1", features = ["v4"] }
 inquire = "0.7"
 indicatif = "0.17"
 console = "0.15"
+dirs = "6.0.0"
 
 [dev-dependencies]
 tempfile = "3"

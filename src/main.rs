@@ -8,10 +8,10 @@ use agentlens::analyze::{
     detect_modules, extract_imports, extract_memory_markers, extract_symbols, FileGraph, ModuleInfo,
 };
 use agentlens::cli::{
-    execute_setup, install_hooks_with_manager, is_interactive, remove_hooks, run_check,
-    run_interactive_init, run_mcp_http_server, run_mcp_server, run_telemetry_all_modules,
-    run_telemetry_module, run_templates, run_update, run_watch, Args, Command, HooksAction,
-    TelemetryAction,
+    execute_setup, install_hooks_with_manager, install_skills, is_interactive, list_skills,
+    remove_hooks, remove_skills, run_check, run_interactive_init, run_mcp_http_server,
+    run_mcp_server, run_telemetry_all_modules, run_telemetry_module, run_templates, run_update,
+    run_watch, Args, Command, HooksAction, SkillsAction, TelemetryAction,
 };
 use agentlens::emit::{
     calculate_module_state, current_timestamp, write_hierarchical, CriticalFile, DiffInfo,
@@ -96,6 +96,18 @@ fn main() -> Result<()> {
             return match action {
                 TelemetryAction::Summary => run_telemetry_all_modules(&output_path),
                 TelemetryAction::Module { slug } => run_telemetry_module(&output_path, &slug),
+            };
+        }
+        Some(Command::Skills { action }) => {
+            return match action {
+                SkillsAction::Install {
+                    claude,
+                    opencode,
+                    codex,
+                    all,
+                } => install_skills(claude, opencode, codex, all),
+                SkillsAction::Remove => remove_skills(),
+                SkillsAction::List => list_skills(),
             };
         }
         None => {}
