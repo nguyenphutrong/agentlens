@@ -50,6 +50,31 @@ pub enum Command {
         #[command(subcommand)]
         action: SkillsAction,
     },
+    /// Build semantic search index for the codebase
+    Index {
+        #[command(subcommand)]
+        action: Option<IndexAction>,
+        /// Force re-index all files (ignore cache)
+        #[arg(long)]
+        force: bool,
+        /// Prune deleted files from index
+        #[arg(long)]
+        prune: bool,
+    },
+    /// Semantic search across the codebase
+    Search {
+        /// Natural language query
+        query: String,
+        /// Number of results to return
+        #[arg(short = 'n', long, default_value = "10")]
+        limit: usize,
+        /// Enable hybrid search (vector + text)
+        #[arg(long)]
+        hybrid: bool,
+        /// Output as JSON
+        #[arg(long)]
+        json: bool,
+    },
 }
 
 #[derive(Subcommand, Debug, Clone)]
@@ -105,6 +130,14 @@ pub enum SkillsAction {
     Remove,
     /// List installed skills and their locations
     List,
+}
+
+#[derive(Subcommand, Debug, Clone)]
+pub enum IndexAction {
+    /// Show index status and statistics
+    Status,
+    /// Clear the search index
+    Clear,
 }
 
 #[derive(Parser, Debug, Clone)]

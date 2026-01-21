@@ -18,6 +18,71 @@ pub struct Config {
     pub lang: Vec<String>,
     pub no_gitignore: Option<bool>,
     pub watch: Option<WatchConfig>,
+    pub search: Option<SearchConfig>,
+}
+
+#[derive(Debug, Clone, Default, Serialize, Deserialize)]
+#[serde(default)]
+pub struct SearchConfig {
+    pub embedder: EmbedderConfig,
+    pub chunking: ChunkingConfig,
+    pub search: SearchOptionsConfig,
+}
+
+#[derive(Debug, Clone, Serialize, Deserialize)]
+#[serde(default)]
+pub struct EmbedderConfig {
+    pub provider: String,
+    pub model: String,
+    pub endpoint: Option<String>,
+    pub dimensions: usize,
+}
+
+impl Default for EmbedderConfig {
+    fn default() -> Self {
+        Self {
+            provider: "ollama".to_string(),
+            model: "nomic-embed-text".to_string(),
+            endpoint: None,
+            dimensions: 768,
+        }
+    }
+}
+
+#[derive(Debug, Clone, Serialize, Deserialize)]
+#[serde(default)]
+pub struct ChunkingConfig {
+    pub max_tokens: usize,
+    pub overlap_tokens: usize,
+    pub strategy: String,
+}
+
+impl Default for ChunkingConfig {
+    fn default() -> Self {
+        Self {
+            max_tokens: 512,
+            overlap_tokens: 50,
+            strategy: "symbol".to_string(),
+        }
+    }
+}
+
+#[derive(Debug, Clone, Serialize, Deserialize)]
+#[serde(default)]
+pub struct SearchOptionsConfig {
+    pub hybrid_enabled: bool,
+    pub hybrid_k: f32,
+    pub default_limit: usize,
+}
+
+impl Default for SearchOptionsConfig {
+    fn default() -> Self {
+        Self {
+            hybrid_enabled: true,
+            hybrid_k: 60.0,
+            default_limit: 10,
+        }
+    }
 }
 
 #[derive(Debug, Clone, Default, Serialize, Deserialize)]

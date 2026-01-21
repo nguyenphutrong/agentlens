@@ -1,6 +1,8 @@
 mod args;
 pub mod check;
 mod hooks;
+mod index;
+mod search;
 mod serve;
 mod skills;
 mod telemetry;
@@ -9,9 +11,11 @@ pub mod tui;
 mod update;
 mod watch;
 
-pub use args::{Args, Command, HooksAction, SkillsAction, TelemetryAction};
+pub use args::{Args, Command, HooksAction, IndexAction, SkillsAction, TelemetryAction};
 pub use check::run_check;
 pub use hooks::{install_hooks, install_hooks_with_manager, remove_hooks};
+pub use index::{run_index, run_index_clear, run_index_status};
+pub use search::run_search;
 pub use serve::{run_mcp_http_server, run_mcp_server};
 pub use skills::{install_skills, list_skills, remove_skills};
 pub use telemetry::{run_telemetry_all_modules, run_telemetry_module, run_telemetry_summary};

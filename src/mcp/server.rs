@@ -19,7 +19,9 @@ use tokio::sync::RwLock;
 use crate::analyze::extract_symbols;
 use crate::cli::check::check_staleness;
 use crate::cli::Args;
+use crate::config::{Config, SearchConfig};
 use crate::scan::scan_directory;
+use crate::search::{create_embedder, EmbedderConfig, GobStore, Searcher};
 use crate::types::{Symbol, Visibility};
 
 #[derive(Debug, Serialize, Deserialize, JsonSchema)]
@@ -32,6 +34,16 @@ pub struct GetModuleParams {
 pub struct GetOutlineParams {
     #[schemars(description = "Relative file path (e.g., 'src/main.rs')")]
     pub file: String,
+}
+
+#[derive(Debug, Serialize, Deserialize, JsonSchema)]
+pub struct SemanticSearchParams {
+    #[schemars(description = "Natural language search query (e.g., 'authentication flow', 'error handling')")]
+    pub query: String,
+    #[schemars(description = "Maximum number of results to return (default: 10)")]
+    pub limit: Option<usize>,
+    #[schemars(description = "Enable hybrid search combining vector and text matching (default: true)")]
+    pub hybrid: Option<bool>,
 }
 
 #[derive(Clone)]
@@ -187,6 +199,73 @@ impl AgentlensServer {
                 Some(json!({ "file": file })),
             )),
         }
+    }
+
+    #[tool(description = "Semantic search across the codebase using natural language queries")]
+    async fn semantic_search(
+        &self,
+        Parameters(params): Parameters<SemanticSearchParams>,
+    ) -> Result<CallToolResult, McpError> {
+        let query = &params.query;
+        let limit = params.limit.unwrap_or(10);
+        let hybrid = params.hybrid.unwrap_or(true);
+
+        let config = Config::load(&self.work_path);
+        let search_config = config
+            .and_then(|c| c.search)
+            .unwrap_or_else(SearchConfig::default);
+
+        let embedder_config = EmbedderConfig {
+            provider: search_config.embedder.provider.clone(),
+            model: search_config.embedder.model.clone(),
+            endpoint: search_config.embedder.endpoint.clone(),
+            dimensions: search_config.embedder.dimensions,
+        };
+        let embedder = Arc::from(create_embedder(&embedder_config));
+
+        let index_path = self.output_path.join("index.json");
+        let store = Arc::new(GobStore::new(index_path));
+
+        let searcher = Searcher::new(
+            store,
+            embedder,
+            hybrid,
+            search_config.search.hybrid_k,
+        );
+
+        let results = searcher
+            .smart_search(query, limit)
+            .await
+            .map_err(|e| McpError::internal_error(format!("Search failed: {}", e), None))?;
+
+        if results.is_empty() {
+            return Ok(CallToolResult::success(vec![Content::text(
+                "No results found. Make sure the index exists (run `agentlens index` first).",
+            )]));
+        }
+
+        let formatted: Vec<serde_json::Value> = results
+            .iter()
+            .map(|r| {
+                json!({
+                    "file": r.chunk.file_path,
+                    "score": format!("{:.3}", r.score),
+                    "lines": format!("{}-{}", r.chunk.start_line, r.chunk.end_line),
+                    "type": format!("{:?}", r.chunk.chunk_type),
+                    "content_preview": r.chunk.content.chars().take(200).collect::<String>(),
+                })
+            })
+            .collect();
+
+        let response = json!({
+            "query": query,
+            "result_count": results.len(),
+            "results": formatted,
+        });
+
+        Ok(CallToolResult::success(vec![Content::text(
+            serde_json::to_string_pretty(&response).unwrap_or_default(),
+        )]))
     }
 }
 

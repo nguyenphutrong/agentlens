@@ -9,9 +9,10 @@ use agentlens::analyze::{
 };
 use agentlens::cli::{
     execute_setup, install_hooks_with_manager, install_skills, is_interactive, list_skills,
-    remove_hooks, remove_skills, run_check, run_interactive_init, run_mcp_http_server,
-    run_mcp_server, run_telemetry_all_modules, run_telemetry_module, run_templates, run_update,
-    run_watch, Args, Command, HooksAction, SkillsAction, TelemetryAction,
+    remove_hooks, remove_skills, run_check, run_index, run_index_clear, run_index_status,
+    run_interactive_init, run_mcp_http_server, run_mcp_server, run_search,
+    run_telemetry_all_modules, run_telemetry_module, run_templates, run_update, run_watch, Args,
+    Command, HooksAction, IndexAction, SkillsAction, TelemetryAction,
 };
 use agentlens::emit::{
     calculate_module_state, current_timestamp, write_hierarchical, CriticalFile, DiffInfo,
@@ -109,6 +110,34 @@ fn main() -> Result<()> {
                 SkillsAction::Remove => remove_skills(),
                 SkillsAction::List => list_skills(),
             };
+        }
+        Some(Command::Index {
+            action,
+            force,
+            prune,
+        }) => {
+            let path = args.path.canonicalize().unwrap_or(args.path.clone());
+            let output_str = args.output.to_string_lossy().to_string();
+            let runtime = tokio::runtime::Runtime::new().expect("Failed to create Tokio runtime");
+            return runtime.block_on(async {
+                match action {
+                    Some(IndexAction::Status) => run_index_status(&path, &output_str).await,
+                    Some(IndexAction::Clear) => run_index_clear(&path, &output_str).await,
+                    None => run_index(&path, force, prune, &output_str, args.verbose > 0).await,
+                }
+            });
+        }
+        Some(Command::Search {
+            query,
+            limit,
+            hybrid,
+            json,
+        }) => {
+            let path = args.path.canonicalize().unwrap_or(args.path.clone());
+            let output_str = args.output.to_string_lossy().to_string();
+            let runtime = tokio::runtime::Runtime::new().expect("Failed to create Tokio runtime");
+            return runtime
+                .block_on(async { run_search(&path, &query, limit, hybrid, json, &output_str).await });
         }
         None => {}
     }
