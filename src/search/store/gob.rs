@@ -141,11 +141,7 @@ impl VectorStore for GobStore {
             0
         };
 
-        let last_updated = data
-            .chunks
-            .values()
-            .map(|c| c.updated_at)
-            .max();
+        let last_updated = data.chunks.values().map(|c| c.updated_at).max();
 
         Ok(IndexStats {
             total_files: data.documents.len(),

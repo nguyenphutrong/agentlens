@@ -62,7 +62,8 @@ impl Searcher {
         let text_results = text_search(&all_chunks, query, limit * 2);
 
         // Combine with RRF
-        let combined = reciprocal_rank_fusion(self.hybrid_k, limit, vec![vector_results, text_results]);
+        let combined =
+            reciprocal_rank_fusion(self.hybrid_k, limit, vec![vector_results, text_results]);
 
         Ok(combined)
     }

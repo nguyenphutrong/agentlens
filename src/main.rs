@@ -136,8 +136,9 @@ fn main() -> Result<()> {
             let path = args.path.canonicalize().unwrap_or(args.path.clone());
             let output_str = args.output.to_string_lossy().to_string();
             let runtime = tokio::runtime::Runtime::new().expect("Failed to create Tokio runtime");
-            return runtime
-                .block_on(async { run_search(&path, &query, limit, hybrid, json, &output_str).await });
+            return runtime.block_on(async {
+                run_search(&path, &query, limit, hybrid, json, &output_str).await
+            });
         }
         None => {}
     }

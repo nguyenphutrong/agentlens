@@ -21,9 +21,7 @@ pub async fn run_search(
     let store_path = path.join(output_dir).join("index.json");
 
     if !store_path.exists() {
-        anyhow::bail!(
-            "No search index found. Run `agentlens index` first to build the index."
-        );
+        anyhow::bail!("No search index found. Run `agentlens index` first to build the index.");
     }
 
     // Create embedder
