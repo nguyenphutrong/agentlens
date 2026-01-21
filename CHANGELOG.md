@@ -5,6 +5,54 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.7.0] - 2026-01-22
+
+### Added
+
+- **Semantic search** - AI-powered code search with natural language queries:
+  - `agentlens index` - Build vector index from codebase
+  - `agentlens search "query"` - Search with natural language
+  - Symbol-based chunking with sliding window fallback
+  - Hybrid search mode (vector + text with RRF fusion)
+- **Ollama embedder** - Local embedding generation via Ollama API (`nomic-embed-text` model, 768 dimensions)
+- **MCP semantic_search tool** - Expose search capabilities to AI tools via Model Context Protocol
+- **Mermaid diagrams** - Visualize module dependencies with `graph TD` diagrams in `INDEX.md`
+- **Interactive install TUI** - Guided setup wizard for first-time users
+- **Skills subcommand** (`agentlens skills`) - Manage AI tool skill configurations
+- **Token counting** - Usage analytics and telemetry module for tracking token consumption
+- **Code of Conduct** - Contributor Covenant added
+
+### Changed
+
+- Renamed `AgentmapServer` to `AgentlensServer` for consistency
+- Updated template markers to use `agentlens` naming
+
+### Fixed
+
+- Clippy warnings across codebase
+- Code formatting with `cargo fmt`
+
+### Configuration
+
+New `[search]` section in `agentlens.toml`:
+
+```toml
+[search]
+[search.embedder]
+provider = "ollama"
+model = "nomic-embed-text"
+dimensions = 768
+
+[search.chunking]
+max_tokens = 512
+strategy = "symbol"
+
+[search.search]
+hybrid_enabled = true
+hybrid_k = 60.0
+default_limit = 10
+```
+
 ## [0.4.2] - 2026-01-07
 
 ### Added
