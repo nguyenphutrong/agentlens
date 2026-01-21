@@ -45,11 +45,7 @@ pub async fn run_index(
             .template("{spinner:.green} {msg}")
             .unwrap(),
     );
-    pb.set_message(format!(
-        "{}Indexing {}...",
-        INDEXING,
-        path.display()
-    ));
+    pb.set_message(format!("{}Indexing {}...", INDEXING, path.display()));
     pb.enable_steady_tick(std::time::Duration::from_millis(100));
 
     // Run indexing
@@ -58,29 +54,19 @@ pub async fn run_index(
     pb.finish_and_clear();
 
     // Report results
-    println!(
-        "\n{}Indexing complete!\n",
-        SUCCESS
-    );
+    println!("\n{}Indexing complete!\n", SUCCESS);
     println!(
         "  Files processed: {}",
         style(result.files_processed).green()
     );
-    println!(
-        "  Chunks created:  {}",
-        style(result.chunks_created).cyan()
-    );
+    println!("  Chunks created:  {}", style(result.chunks_created).cyan());
     println!(
         "  Files skipped:   {} (unchanged)",
         style(result.files_skipped).dim()
     );
 
     if !result.errors.is_empty() {
-        println!(
-            "\n{}Errors ({}):",
-            ERROR,
-            result.errors.len()
-        );
+        println!("\n{}Errors ({}):", ERROR, result.errors.len());
         for error in result.errors.iter().take(10) {
             println!("  - {}", style(error).red());
         }
@@ -105,10 +91,7 @@ pub async fn run_index(
     println!("\n{}Index Statistics:", INFO);
     println!("  Total files:     {}", stats.total_files);
     println!("  Total chunks:    {}", stats.total_chunks);
-    println!(
-        "  Index size:      {} KB",
-        stats.index_size_bytes / 1024
-    );
+    println!("  Index size:      {} KB", stats.index_size_bytes / 1024);
     if let Some(updated) = stats.last_updated {
         println!("  Last updated:    {}", updated.format("%Y-%m-%d %H:%M:%S"));
     }

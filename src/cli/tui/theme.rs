@@ -2,18 +2,17 @@ use console::style;
 use inquire::ui::{Attributes, Color, RenderConfig, StyleSheet, Styled};
 
 pub fn agentlens_theme() -> RenderConfig<'static> {
-    let mut config = RenderConfig::default();
-
-    config.prompt_prefix = Styled::new("?").with_fg(Color::LightCyan);
-    config.highlighted_option_prefix = Styled::new("❯").with_fg(Color::LightCyan);
-    config.selected_checkbox = Styled::new("◉").with_fg(Color::LightGreen);
-    config.unselected_checkbox = Styled::new("○").with_fg(Color::DarkGrey);
-    config.answer = StyleSheet::new().with_fg(Color::LightCyan);
-    config.help_message = StyleSheet::new()
-        .with_fg(Color::DarkGrey)
-        .with_attr(Attributes::ITALIC);
-
-    config
+    RenderConfig {
+        prompt_prefix: Styled::new("?").with_fg(Color::LightCyan),
+        highlighted_option_prefix: Styled::new("❯").with_fg(Color::LightCyan),
+        selected_checkbox: Styled::new("◉").with_fg(Color::LightGreen),
+        unselected_checkbox: Styled::new("○").with_fg(Color::DarkGrey),
+        answer: StyleSheet::new().with_fg(Color::LightCyan),
+        help_message: StyleSheet::new()
+            .with_fg(Color::DarkGrey)
+            .with_attr(Attributes::ITALIC),
+        ..Default::default()
+    }
 }
 
 pub fn print_banner() {

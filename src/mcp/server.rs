@@ -19,7 +19,7 @@ use tokio::sync::RwLock;
 use crate::analyze::extract_symbols;
 use crate::cli::check::check_staleness;
 use crate::cli::Args;
-use crate::config::{Config, SearchConfig};
+use crate::config::Config;
 use crate::scan::scan_directory;
 use crate::search::{create_embedder, EmbedderConfig, GobStore, Searcher};
 use crate::types::{Symbol, Visibility};
@@ -38,11 +38,15 @@ pub struct GetOutlineParams {
 
 #[derive(Debug, Serialize, Deserialize, JsonSchema)]
 pub struct SemanticSearchParams {
-    #[schemars(description = "Natural language search query (e.g., 'authentication flow', 'error handling')")]
+    #[schemars(
+        description = "Natural language search query (e.g., 'authentication flow', 'error handling')"
+    )]
     pub query: String,
     #[schemars(description = "Maximum number of results to return (default: 10)")]
     pub limit: Option<usize>,
-    #[schemars(description = "Enable hybrid search combining vector and text matching (default: true)")]
+    #[schemars(
+        description = "Enable hybrid search combining vector and text matching (default: true)"
+    )]
     pub hybrid: Option<bool>,
 }
 
@@ -211,9 +215,7 @@ impl AgentlensServer {
         let hybrid = params.hybrid.unwrap_or(true);
 
         let config = Config::load(&self.work_path);
-        let search_config = config
-            .and_then(|c| c.search)
-            .unwrap_or_else(SearchConfig::default);
+        let search_config = config.and_then(|c| c.search).unwrap_or_default();
 
         let embedder_config = EmbedderConfig {
             provider: search_config.embedder.provider.clone(),
@@ -226,12 +228,7 @@ impl AgentlensServer {
         let index_path = self.output_path.join("index.json");
         let store = Arc::new(GobStore::new(index_path));
 
-        let searcher = Searcher::new(
-            store,
-            embedder,
-            hybrid,
-            search_config.search.hybrid_k,
-        );
+        let searcher = Searcher::new(store, embedder, hybrid, search_config.search.hybrid_k);
 
         let results = searcher
             .smart_search(query, limit)

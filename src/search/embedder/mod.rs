@@ -33,13 +33,13 @@ impl Default for EmbedderConfig {
 }
 
 pub fn create_embedder(config: &EmbedderConfig) -> Box<dyn Embedder> {
-    match config.provider.as_str() {
-        "ollama" | _ => {
-            let endpoint = config
-                .endpoint
-                .clone()
-                .unwrap_or_else(|| "http://localhost:11434".to_string());
-            Box::new(OllamaEmbedder::new(&endpoint, &config.model, config.dimensions))
-        }
-    }
+    let endpoint = config
+        .endpoint
+        .clone()
+        .unwrap_or_else(|| "http://localhost:11434".to_string());
+    Box::new(OllamaEmbedder::new(
+        &endpoint,
+        &config.model,
+        config.dimensions,
+    ))
 }
