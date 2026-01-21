@@ -129,6 +129,7 @@ Trước khi làm việc với codebase này, đọc .agentlens/INDEX.md để �
 | **🪝 Git Hooks** | Giữ docs đồng bộ qua các branches |
 | **🌐 Remote Repos** | Phân tích GitHub repos trực tiếp |
 | **🔌 MCP Server** | Tích hợp native với Claude Desktop & Cursor |
+| **🔍 Semantic Search** | Tìm code bằng truy vấn ngôn ngữ tự nhiên |
 
 ---
 
@@ -210,7 +211,37 @@ npx @agentlens/cli serve --mcp
 }
 ```
 
-Tools: `regenerate`, `get_module`, `check_stale`, `get_outline`
+Tools: `regenerate`, `get_module`, `check_stale`, `get_outline`, `semantic_search`
+
+### Semantic Search
+
+Tìm kiếm codebase bằng truy vấn ngôn ngữ tự nhiên. Yêu cầu [Ollama](https://ollama.ai/) với model `nomic-embed-text`.
+
+```bash
+# Đầu tiên, tạo search index
+agentlens index
+
+# Tìm kiếm bằng ngôn ngữ tự nhiên
+agentlens search "authentication flow"
+agentlens search "error handling" --limit 20
+agentlens search "database queries" --hybrid   # kết hợp vector + text search
+
+# Quản lý index
+agentlens index status   # Hiển thị thống kê index
+agentlens index clear    # Xóa index
+```
+
+**Cài đặt Ollama:**
+```bash
+# Cài Ollama (macOS)
+brew install ollama
+
+# Pull embedding model
+ollama pull nomic-embed-text
+
+# Khởi động Ollama server
+ollama serve
+```
 
 ---
 
@@ -275,6 +306,23 @@ ignore = ["*.test.ts", "fixtures/", "__mocks__/"]
 
 [watch]
 debounce_ms = 300
+
+[search]
+[search.embedder]
+provider = "ollama"
+model = "nomic-embed-text"
+dimensions = 768
+# endpoint = "http://localhost:11434"  # Ollama endpoint tùy chỉnh
+
+[search.chunking]
+max_tokens = 512
+overlap_tokens = 50
+strategy = "symbol"          # "symbol" hoặc "window"
+
+[search.search]
+hybrid_enabled = true        # Kết hợp vector + text search
+hybrid_k = 60.0              # Tham số RRF fusion
+default_limit = 10
 ```
 
 ### AI Tool Templates
@@ -332,6 +380,8 @@ Commands:
   init        Khởi tạo cấu hình
   serve       Khởi động MCP server
   telemetry   Phân tích token usage và hiệu quả
+  index       Tạo semantic search index
+  search      Tìm kiếm codebase bằng ngôn ngữ tự nhiên
   update      Cập nhật lên phiên bản mới nhất
 ```
 

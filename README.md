@@ -129,6 +129,7 @@ Before working on this codebase, read .agentlens/INDEX.md for navigation.
 | **🪝 Git Hooks** | Keep docs synced across branches |
 | **🌐 Remote Repos** | Analyze GitHub repos directly |
 | **🔌 MCP Server** | Native integration with Claude Desktop & Cursor |
+| **🔍 Semantic Search** | Find code using natural language queries |
 
 ---
 
@@ -210,7 +211,37 @@ npx @agentlens/cli serve --mcp
 }
 ```
 
-Tools: `regenerate`, `get_module`, `check_stale`, `get_outline`
+Tools: `regenerate`, `get_module`, `check_stale`, `get_outline`, `semantic_search`
+
+### Semantic Search
+
+Search your codebase using natural language queries. Requires [Ollama](https://ollama.ai/) with `nomic-embed-text` model.
+
+```bash
+# First, create the search index
+agentlens index
+
+# Search with natural language
+agentlens search "authentication flow"
+agentlens search "error handling" --limit 20
+agentlens search "database queries" --hybrid   # combines vector + text search
+
+# Manage the index
+agentlens index status   # Show index statistics
+agentlens index clear    # Remove the index
+```
+
+**Setup Ollama:**
+```bash
+# Install Ollama (macOS)
+brew install ollama
+
+# Pull the embedding model
+ollama pull nomic-embed-text
+
+# Start Ollama server
+ollama serve
+```
 
 ### Agent Skills
 
@@ -291,6 +322,23 @@ ignore = ["*.test.ts", "fixtures/", "__mocks__/"]
 
 [watch]
 debounce_ms = 300
+
+[search]
+[search.embedder]
+provider = "ollama"
+model = "nomic-embed-text"
+dimensions = 768
+# endpoint = "http://localhost:11434"  # Custom Ollama endpoint
+
+[search.chunking]
+max_tokens = 512
+overlap_tokens = 50
+strategy = "symbol"          # "symbol" or "window"
+
+[search.search]
+hybrid_enabled = true        # Combine vector + text search
+hybrid_k = 60.0              # RRF fusion parameter
+default_limit = 10
 ```
 
 ### AI Tool Templates
@@ -349,6 +397,8 @@ Commands:
   serve       Start MCP server
   skills      Manage agent skills for AI tools
   telemetry   Analyze token usage and efficiency
+  index       Build semantic search index
+  search      Search codebase with natural language
   update      Update to latest version
 ```
 
